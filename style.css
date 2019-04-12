@@ -1,9 +1,13 @@
 html {
-    height: 100%;
+    height: 99%;
 }
+
 body {
-    margin: 50px;
-    padding: 50px;
-    width: 100%;
-    height: 100%;
+    width: 99%;
+    height: 99%;
+}
+
+canvas {
+    display: block;
+    margin: auto;
 }

@@ -1,41 +1,42 @@
-const baseSize = 50;
-const offset = 50;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const baseSize = canvas.width / 8;
+const offset = baseSize;
+const baseRadiusSize = baseSize / 6;
 let firstPlayer = true;
 
 const circles = [
-    {x: 0, y: 0, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 3, y: 0, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 6, y: 0, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 0, y: 0, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 3, y: 0, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 6, y: 0, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 1, y: 1, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 3, y: 1, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 5, y: 1, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 1, y: 1, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 3, y: 1, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 5, y: 1, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 2, y: 2, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 3, y: 2, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 4, y: 2, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 2, y: 2, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 3, y: 2, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 4, y: 2, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 0, y: 3, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 1, y: 3, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 2, y: 3, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 0, y: 3, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 1, y: 3, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 2, y: 3, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 4, y: 3, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 5, y: 3, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 6, y: 3, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 4, y: 3, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 5, y: 3, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 6, y: 3, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 2, y: 4, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 3, y: 4, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 4, y: 4, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 2, y: 4, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 3, y: 4, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 4, y: 4, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 1, y: 5, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 3, y: 5, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 5, y: 5, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 1, y: 5, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 3, y: 5, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 5, y: 5, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 
-    {x: 0, y: 6, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 3, y: 6, radius: 7, color: 'rgba(0,0,0,255)'},
-    {x: 6, y: 6, radius: 7, color: 'rgba(0,0,0,255)'},
+    {x: 0, y: 6, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 3, y: 6, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
+    {x: 6, y: 6, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
 ];
 
 function isIntersect(point, circle) {
@@ -97,19 +98,19 @@ function drawCircle(circle) {
 
 
     canvas.addEventListener('click', (e) => {
-        const pos = {
-            x: e.clientX,
-            y: e.clientY
-        };
+        // const pos = {
+        //     x: e.clientX,
+        //     y: e.clientY
+        // };
         const relativePosition = getMousePos(e);
         circles.forEach(circle => {
             const pixel = ctx.getImageData(relativePosition.x, relativePosition.y, 1, 1).data;
             if (isIntersect(relativePosition, circle)) {
                 if (circle.color === 'rgba(' + pixel + ')') {
                     if (firstPlayer) {
-                        drawCircle({x: circle.x, y: circle.y, radius: circle.radius * 2, color: 'rgba(255,0,0,255)'});
+                        drawCircle({x: circle.x, y: circle.y, radius: circle.radius * 2, color: 'rgb(180,0,0)'});
                     } else {
-                        drawCircle({x: circle.x, y: circle.y, radius: circle.radius * 2, color: 'rgba(0,255,0,255)'});
+                        drawCircle({x: circle.x, y: circle.y, radius: circle.radius * 2, color: 'rgb(0,107,0)'});
                     }
                     firstPlayer = !firstPlayer;
                 }
