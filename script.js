@@ -86,10 +86,6 @@ function drawBoard() {
 
     redPieces.filter(piece => piece.x != null && piece.y != null).forEach(filteredPiece => drawCircle(filteredPiece));
     greenPieces.filter(piece => piece.x != null && piece.y != null).forEach(filteredPiece => drawCircle(filteredPiece));
-
-    if (redPieces.filter(piece => piece.x != null && piece.y != null).length >= 3) {
-        moveType = moveTypes.REMOVE;
-    }
 }
 
 function getMousePos(evt) {
@@ -110,12 +106,38 @@ function drawCircle(circle) {
 }
 
 function setAvailablePiece(pieces, circle) {
-    const filteredResult = pieces.filter(piece => piece.x == null && piece.y == null);
-    if (filteredResult) {
-        filteredResult[0].x = circle.x;
-        filteredResult[0].y = circle.y;
+    const foundPiece = pieces.find(piece => piece.x == null && piece.y == null);
+    if (foundPiece) {
+        foundPiece.x = circle.x;
+        foundPiece.y = circle.y;
+        if(checkForMill(pieces, foundPiece)){
+            moveType = moveTypes.REMOVE;
+        }
         drawBoard();
     }
+}
+
+function checkForMill(pieces, newPiece) {
+    if (newPiece.x === 3) {
+        if (pieces.filter(piece => piece.x === newPiece.x && ((newPiece.y > 3 && piece.y > 3) || (newPiece.y < 3 && piece.y < 3))).length === 3) {
+            return true;
+        }
+    } else {
+        if (pieces.filter(piece => piece.x === newPiece.x).length === 3) {
+            return true;
+        }
+    }
+
+    if (newPiece.y === 3) {
+        if (pieces.filter(piece => piece.y === newPiece.y && ((newPiece.x > 3 && piece.x > 3) || (newPiece.x < 3 && piece.x < 3))).length === 3) {
+            return true;
+        }
+    } else {
+        if (pieces.filter(piece => piece.y === newPiece.y).length === 3) {
+            return true;
+        }
+    }
+    return false;
 }
 
 (function main() {
