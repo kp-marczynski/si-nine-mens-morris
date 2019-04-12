@@ -3,7 +3,14 @@ const ctx = canvas.getContext('2d');
 const baseSize = canvas.width / 8;
 const offset = baseSize;
 const baseRadiusSize = baseSize / 6;
-let firstPlayer = true;
+let isRedPlayerTurn = true;
+const moveTypes = {
+    NORMAL: 'normal',
+    REMOVE: 'remove'
+};
+let moveType = 'normal';
+const redPieces = [];
+const greenPieces = [];
 
 const circles = [
     {x: 0, y: 0, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
@@ -43,18 +50,19 @@ function isIntersect(point, circle) {
     return Math.sqrt((point.x - getRealCoordinate(circle.x)) ** 2 + (point.y - getRealCoordinate(circle.y)) ** 2) < circle.radius;
 }
 
-function drawSquare(x, y, size, shouldFill) {
+function drawSquare(x, y, size) {
     const finalSize = size * baseSize;
     const finalX = getRealCoordinate(x);
     const finalY = getRealCoordinate(y);
     ctx.beginPath();
-    if (shouldFill) {
-        ctx.fillStyle = 'rgba(255,255,255,255)';
-        ctx.border =
-            ctx.fillRect(finalX, finalY, finalSize, finalSize);
-    } else {
-        ctx.rect(finalX, finalY, finalSize, finalSize);
-    }
+    ctx.rect(finalX, finalY, finalSize, finalSize);
+    ctx.stroke();
+}
+
+function drawLine(xStart, yStart, xEnd, yEnd) {
+    ctx.beginPath();
+    ctx.moveTo(getRealCoordinate(xStart), getRealCoordinate(yStart));
+    ctx.lineTo(getRealCoordinate(xEnd), getRealCoordinate(yEnd));
     ctx.stroke();
 }
 
@@ -63,13 +71,25 @@ function getRealCoordinate(val) {
 }
 
 function drawBoard() {
-    drawSquare(0, 0, 3);
-    drawSquare(3, 0, 3);
-    drawSquare(0, 3, 3);
-    drawSquare(3, 3, 3);
-    drawSquare(1, 1, 4);
-    drawSquare(2, 2, 2, true);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawSquare(2, 2, 2);
+    drawSquare(1, 1, 4);
+    drawSquare(0, 0, 6);
+    drawLine(0, 3, 2, 3);
+    drawLine(4, 3, 6, 3);
+    drawLine(3, 0, 3, 2);
+    drawLine(3, 4, 3, 6);
+
+    circles.forEach(circle => {
+        drawCircle(circle);
+    });
+
+    redPieces.filter(piece => piece.x != null && piece.y != null).forEach(filteredPiece => drawCircle(filteredPiece));
+    greenPieces.filter(piece => piece.x != null && piece.y != null).forEach(filteredPiece => drawCircle(filteredPiece));
+
+    if (redPieces.filter(piece => piece.x != null && piece.y != null).length >= 3) {
+        moveType = moveTypes.REMOVE;
+    }
 }
 
 function getMousePos(evt) {
@@ -89,33 +109,53 @@ function drawCircle(circle) {
     ctx.fill();
 }
 
+function setAvailablePiece(pieces, circle) {
+    const filteredResult = pieces.filter(piece => piece.x == null && piece.y == null);
+    if (filteredResult) {
+        filteredResult[0].x = circle.x;
+        filteredResult[0].y = circle.y;
+        drawBoard();
+    }
+}
+
 (function main() {
     drawBoard();
-
-    circles.forEach(circle => {
-        drawCircle(circle);
-    });
-
+    for (let i = 0; i < 15; ++i) {
+        redPieces.push({x: null, y: null, radius: baseRadiusSize * 2, color: 'rgba(180,0,0,255)'});
+        greenPieces.push({x: null, y: null, radius: baseRadiusSize * 2, color: 'rgba(0,100,0,255)'});
+    }
 
     canvas.addEventListener('click', (e) => {
-        // const pos = {
-        //     x: e.clientX,
-        //     y: e.clientY
-        // };
         const relativePosition = getMousePos(e);
-        circles.forEach(circle => {
-            const pixel = ctx.getImageData(relativePosition.x, relativePosition.y, 1, 1).data;
-            if (isIntersect(relativePosition, circle)) {
-                if (circle.color === 'rgba(' + pixel + ')') {
-                    if (firstPlayer) {
-                        drawCircle({x: circle.x, y: circle.y, radius: circle.radius * 2, color: 'rgb(180,0,0)'});
-                    } else {
-                        drawCircle({x: circle.x, y: circle.y, radius: circle.radius * 2, color: 'rgb(0,107,0)'});
+        const pixel = ctx.getImageData(relativePosition.x, relativePosition.y, 1, 1).data;
+        if (moveType === moveTypes.NORMAL) {
+            circles.forEach(circle => {
+                if (isIntersect(relativePosition, circle)) {
+                    if (circle.color === 'rgba(' + pixel + ')') {
+                        if (isRedPlayerTurn) {
+                            setAvailablePiece(redPieces, circle);
+                        } else {
+                            setAvailablePiece(greenPieces, circle);
+                        }
+                        isRedPlayerTurn = !isRedPlayerTurn;
                     }
-                    firstPlayer = !firstPlayer;
                 }
-
+            });
+        } else if (moveType === moveTypes.REMOVE) {
+            let pieces = [];
+            if (isRedPlayerTurn) {
+                pieces = redPieces;
+            } else {
+                pieces = greenPieces;
             }
-        });
+            pieces.forEach(piece => {
+                if (isIntersect(relativePosition, piece)) {
+                    piece.x = null;
+                    piece.y = null;
+                    moveType = moveTypes.NORMAL;
+                    drawBoard();
+                }
+            })
+        }
     });
 })();
