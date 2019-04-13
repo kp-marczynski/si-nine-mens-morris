@@ -1,8 +1,31 @@
-<div>Turn: {{isRedPlayerTurn ? 'RED' : 'GREEN'}}</div>
-<div>Move type: {{moveType}}</div>
-<div>Available reds: {{availableReds}}</div>
-<div>Available greens: {{availableGreens}}</div>
-<div>Used reds: {{usedReds}}</div>
-<div>Used greens: {{usedGreens}}</div>
-
-<canvas id="canvas" width="500" height="500">></canvas>
+<mat-card class="score-board">
+    <table>
+        <tr>
+            <td>Turn:</td>
+            <td>{{turn}}</td>
+        </tr>
+        <tr>
+            <td>Move type:</td>
+            <td>{{moveType}}</td>
+        </tr>
+        <tr>
+            <td>Available reds:</td>
+            <td>{{availableReds}}</td>
+        </tr>
+        <tr>
+            <td>Available greens:</td>
+            <td>{{availableGreens}}</td>
+        </tr>
+        <tr>
+            <td>Used reds:</td>
+            <td>{{usedReds}}</td>
+        </tr>
+        <tr>
+            <td>Used greens:</td>
+            <td>{{usedGreens}}</td>
+        </tr>
+    </table>
+</mat-card>
+<mat-card class="canvas-wrapper" id="canvas-wrapper">
+    <canvas id="canvas" width="500" height="500">></canvas>
+</mat-card>
