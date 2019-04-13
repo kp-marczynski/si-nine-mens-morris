@@ -28,7 +28,7 @@ export class AppComponent implements AfterViewInit {
 
     circles: ICircle[] = [];
 
-    piecesPerPlayer = 15;
+    piecesPerPlayer = 9;
 
     canvasService: CanvasService;
 
@@ -106,7 +106,7 @@ export class AppComponent implements AfterViewInit {
             const pixel = this.canvasService.getPixel(relativePosition);
             if (this.moveType === MoveType.NORMAL) {
                 this.performNormalMove(relativePosition, pixel);
-            } else if (this.moveType === MoveType.REMOVE) {
+            } else if (this.moveType === MoveType.REMOVE_OPPONENT || this.moveType === MoveType.REMOVE_OPPONENT_2) {
                 this.performRemoveMove(relativePosition);
             }
         });
@@ -122,7 +122,7 @@ export class AppComponent implements AfterViewInit {
                 } else {
                     this.canvas.style.cursor = 'default';
                 }
-            } else if (this.moveType === MoveType.REMOVE) {
+            } else if (this.moveType === MoveType.REMOVE_OPPONENT) {
                 if (this.findIntersectingPieceForRemove(relativePosition)) {
                     this.canvas.style.cursor = 'pointer';
                 } else {
@@ -173,8 +173,13 @@ export class AppComponent implements AfterViewInit {
             } else {
                 this.greenPieces = this.greenPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
             }
-            this.moveType = MoveType.NORMAL;
-            this.changeTurn();
+            if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
+                this.moveType = MoveType.REMOVE_OPPONENT;
+                this.drawBoard();
+            } else {
+                this.moveType = MoveType.NORMAL;
+                this.changeTurn();
+            }
         }
     }
 
@@ -228,11 +233,19 @@ export class AppComponent implements AfterViewInit {
         if (foundPiece) {
             foundPiece.x = circle.x;
             foundPiece.y = circle.y;
-            if (this.checkForMill(pieces, foundPiece)) {
-                this.moveType = MoveType.REMOVE;
-                this.drawBoard();
-            } else {
-                this.changeTurn();
+            const mill = this.checkForMill(pieces, foundPiece);
+            switch (mill) {
+                case 1:
+                    this.moveType = MoveType.REMOVE_OPPONENT;
+                    this.drawBoard();
+                    break;
+                case 2:
+                    this.moveType = MoveType.REMOVE_OPPONENT_2;
+                    this.drawBoard();
+                    break;
+                default:
+                    this.changeTurn();
+                    break;
             }
         }
     }
@@ -243,32 +256,54 @@ export class AppComponent implements AfterViewInit {
         } else {
             this.turn = Turn.RED;
         }
+        this.adjustMoveType();
         this.drawBoard();
     }
 
-    checkForMill(pieces: ICircle[], newPiece: ICircle): boolean {
+    adjustMoveType() {
+        let numberOfAvailablePieces = 0;
+        let numberOfAllPieces = 0;
+        if (this.turn === Turn.RED) {
+            numberOfAllPieces = this.redPieces.length;
+            numberOfAvailablePieces = this.redPieces.filter(piece => piece.x === null && piece.y === null).length;
+        } else {
+            numberOfAllPieces = this.greenPieces.length;
+            numberOfAvailablePieces = this.greenPieces.filter(piece => piece.x === null && piece.y === null).length;
+        }
+
+        if (numberOfAllPieces < 3) {
+            alert("Player " + this.turn + " has lost");
+        } else if (numberOfAllPieces === 3) {
+            this.moveType = MoveType.MOVE_ANYWHERE;
+        } else if (numberOfAvailablePieces === 0) {
+            this.moveType = MoveType.MOVE_NEARBY;
+        }
+    }
+
+    checkForMill(pieces: ICircle[], newPiece: ICircle): number {
+        let result = 0;
         if (newPiece.x === 3) {
             if (pieces.filter(piece => piece.x === newPiece.x &&
                 ((newPiece.y > 3 && piece.y > 3) || (newPiece.y < 3 && piece.y < 3))).length === 3) {
-                return true;
+                result++;
             }
         } else {
             if (pieces.filter(piece => piece.x === newPiece.x).length === 3) {
-                return true;
+                result++;
             }
         }
 
         if (newPiece.y === 3) {
             if (pieces.filter(piece => piece.y === newPiece.y &&
                 ((newPiece.x > 3 && piece.x > 3) || (newPiece.x < 3 && piece.x < 3))).length === 3) {
-                return true;
+                result++;
             }
         } else {
             if (pieces.filter(piece => piece.y === newPiece.y).length === 3) {
-                return true;
+                result++;
             }
         }
-        return false;
+        return result;
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {
