@@ -26,9 +26,13 @@ export class CanvasService {
     }
 
     public drawCircle(circle: ICircle): void {
+        this.drawCircleInCoords(circle, circle.x, circle.y);
+    }
+
+    public drawCircleInCoords(circle: ICircle, x: number, y: number) {
         this.ctx.beginPath();
-        const finalX = this.getRealCoordinate(circle.x);
-        const finalY = this.getRealCoordinate(circle.y);
+        const finalX = this.getRealCoordinate(x);
+        const finalY = this.getRealCoordinate(y);
         this.ctx.arc(finalX, finalY, circle.radius, 0, 2 * Math.PI);
         this.ctx.fillStyle = circle.color;
         this.ctx.fill();

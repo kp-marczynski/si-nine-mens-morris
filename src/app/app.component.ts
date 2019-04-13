@@ -17,7 +17,6 @@ export class AppComponent implements AfterViewInit {
     usedReds: number;
     usedGreens: number;
 
-
     baseSize: number;
 
     offset: number;
@@ -32,6 +31,9 @@ export class AppComponent implements AfterViewInit {
     piecesPerPlayer = 15;
 
     canvasService: CanvasService;
+
+    redDrawerCanvasService: CanvasService;
+    greenDrawerCanvasService: CanvasService;
 
     initCircles() {
         this.circles = [
@@ -79,6 +81,9 @@ export class AppComponent implements AfterViewInit {
         this.offset = this.baseSize;
         this.baseRadiusSize = this.baseSize / 6;
         this.canvasService = new CanvasService(this.canvas, this.baseSize, this.offset);
+
+        this.redDrawerCanvasService = new CanvasService(document.getElementById('red-drawer') as HTMLCanvasElement, 50, 50);
+        this.greenDrawerCanvasService = new CanvasService(document.getElementById('green-drawer') as HTMLCanvasElement, 50, 50);
 
         this.initializePlayersPieces();
 
@@ -197,8 +202,26 @@ export class AppComponent implements AfterViewInit {
 
         this.usedReds = this.redPieces.filter(piece => piece.x != null && piece.y != null).length;
         this.usedGreens = this.greenPieces.filter(piece => piece.x != null && piece.y != null).length;
+
+        this.drawRedDrawer();
+        this.drawGreenDrawer();
     }
 
+    drawRedDrawer() {
+        this.redDrawerCanvasService.clearCanvas();
+        let circlesForDrawer = this.redPieces.filter(piece => piece.x == null && piece.y == null);
+        for (let i = 0; i < circlesForDrawer.length; ++i) {
+            this.redDrawerCanvasService.drawCircleInCoords(circlesForDrawer[i], i % 3, Math.floor(i / 3));
+        }
+    }
+
+    drawGreenDrawer() {
+        this.greenDrawerCanvasService.clearCanvas();
+        let circlesForDrawer = this.greenPieces.filter(piece => piece.x == null && piece.y == null);
+        for (let i = 0; i < circlesForDrawer.length; ++i) {
+            this.greenDrawerCanvasService.drawCircleInCoords(circlesForDrawer[i], i % 3, Math.floor(i / 3));
+        }
+    }
 
     setAvailablePiece(pieces: ICircle[], circle: ICircle): void {
         const foundPiece = pieces.find(piece => piece.x == null && piece.y == null);

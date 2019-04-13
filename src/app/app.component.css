@@ -4,10 +4,27 @@ mat-card {
 
 .score-board {
     width: 200px;
+    position: fixed;
 }
 
 .canvas-wrapper {
-    margin: auto;
+    margin: 1rem auto;
     width: 500px;
-    height: 500px;
+    /*height: 500px;*/
+}
+
+.game-wrapper {
+    margin: auto;
+    padding-top: 10rem;
+    max-width: 1280px;
+}
+
+canvas {
+    margin: auto;
+    display: block;
+}
+
+h1 {
+    position: center;
+    text-align: center;
 }

@@ -4,6 +4,7 @@ import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {MatCardModule} from '@angular/material/card';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 @NgModule({
     declarations: [
@@ -12,7 +13,8 @@ import {MatCardModule} from '@angular/material/card';
     imports: [
         BrowserModule,
         NoopAnimationsModule,
-        MatCardModule
+        MatCardModule,
+        MatGridListModule
     ],
     providers: [],
     bootstrap: [AppComponent]

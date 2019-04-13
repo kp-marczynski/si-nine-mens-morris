@@ -26,6 +26,26 @@
         </tr>
     </table>
 </mat-card>
-<mat-card class="canvas-wrapper" id="canvas-wrapper">
-    <canvas id="canvas" width="500" height="500">></canvas>
-</mat-card>
+<h1>{{turn}} : {{moveType}}</h1>
+<div class="game-wrapper">
+    <mat-grid-list cols="5" rowHeight="550px">
+        <mat-grid-tile>
+            <mat-card class="canvas-wrapper">
+                <canvas id="red-drawer" width="200" height="300"></canvas>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="3">
+            <mat-card class="canvas-wrapper" id="canvas-wrapper">
+                <canvas id="canvas" width="500" height="500">></canvas>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <mat-card class="canvas-wrapper">
+                <canvas id="green-drawer" width="200" height="300"></canvas>
+            </mat-card>
+        </mat-grid-tile>
+        <!--<mat-grid-tile>3</mat-grid-tile>-->
+        <!--<mat-grid-tile>4</mat-grid-tile>-->
+    </mat-grid-list>
+
+</div>
