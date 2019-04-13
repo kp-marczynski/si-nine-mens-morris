@@ -104,14 +104,22 @@ export class AppComponent implements AfterViewInit {
         this.canvas.addEventListener('click', (mouseEvent) => {
             const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
             const pixel = this.canvasService.getPixel(relativePosition);
-            if (this.moveType === MoveType.NORMAL) {
-                this.performNormalMove(relativePosition, pixel);
-            } else if (this.moveType === MoveType.REMOVE_OPPONENT || this.moveType === MoveType.REMOVE_OPPONENT_2) {
-                this.performRemoveMove(relativePosition);
+
+            switch (this.moveType) {
+                case MoveType.NORMAL:
+                    this.performNormalMove(relativePosition, pixel);
+                    break;
+                case MoveType.REMOVE_OPPONENT:
+                case MoveType.REMOVE_OPPONENT_2:
+                    this.performRemoveMove(relativePosition);
+                    break;
+                case MoveType.MOVE_NEARBY:
+                case MoveType.MOVE_ANYWHERE:
+                    alert("State not implemented yet"); // todo
+
             }
         });
     }
-
     addCanvasOnMouseMoveListener(): void {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
             const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
