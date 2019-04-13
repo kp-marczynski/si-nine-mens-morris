@@ -5,12 +5,32 @@ export interface ICircle {
   color: string;
 }
 
-export class Circle implements ICircle {
+export class BoardCircle implements ICircle {
+  color = 'rgba(0,0,0,255)';
   constructor(
     public x: number,
     public y: number,
-    public radius: number,
-    public color: string
+    public radius: number
+  ) {
+  }
+}
+
+export class RedPiece implements ICircle {
+  color = 'rgba(180,0,0,255)';
+  constructor(
+      public x: number,
+      public y: number,
+      public radius: number
+  ) {
+  }
+}
+
+export class GreenPiece implements ICircle {
+  color = 'rgba(0,100,0,255)';
+  constructor(
+      public x: number,
+      public y: number,
+      public radius: number
   ) {
   }
 }

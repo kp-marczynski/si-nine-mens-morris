@@ -1,5 +1,5 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {Circle, ICircle} from './circle.model';
+import {BoardCircle, GreenPiece, ICircle, RedPiece} from './circle.model';
 import {MoveType} from './move-type.enum';
 import {CanvasService} from './canvas.service';
 import {IPosition} from './position.model';
@@ -35,37 +35,37 @@ export class AppComponent implements AfterViewInit {
 
     initCircles() {
         this.circles = [
-            new Circle(0, 0, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(3, 0, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(6, 0, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(0, 0, this.baseRadiusSize),
+            new BoardCircle(3, 0, this.baseRadiusSize),
+            new BoardCircle(6, 0, this.baseRadiusSize),
 
-            new Circle(1, 1, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(3, 1, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(5, 1, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(1, 1, this.baseRadiusSize),
+            new BoardCircle(3, 1, this.baseRadiusSize),
+            new BoardCircle(5, 1, this.baseRadiusSize),
 
-            new Circle(2, 2, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(3, 2, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(4, 2, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(2, 2, this.baseRadiusSize),
+            new BoardCircle(3, 2, this.baseRadiusSize),
+            new BoardCircle(4, 2, this.baseRadiusSize),
 
-            new Circle(0, 3, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(1, 3, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(2, 3, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(0, 3, this.baseRadiusSize),
+            new BoardCircle(1, 3, this.baseRadiusSize),
+            new BoardCircle(2, 3, this.baseRadiusSize),
 
-            new Circle(4, 3, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(5, 3, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(6, 3, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(4, 3, this.baseRadiusSize),
+            new BoardCircle(5, 3, this.baseRadiusSize),
+            new BoardCircle(6, 3, this.baseRadiusSize),
 
-            new Circle(2, 4, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(3, 4, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(4, 4, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(2, 4, this.baseRadiusSize),
+            new BoardCircle(3, 4, this.baseRadiusSize),
+            new BoardCircle(4, 4, this.baseRadiusSize),
 
-            new Circle(1, 5, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(3, 5, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(5, 5, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(1, 5, this.baseRadiusSize),
+            new BoardCircle(3, 5, this.baseRadiusSize),
+            new BoardCircle(5, 5, this.baseRadiusSize),
 
-            new Circle(0, 6, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(3, 6, this.baseRadiusSize, 'rgba(0,0,0,255)'),
-            new Circle(6, 6, this.baseRadiusSize, 'rgba(0,0,0,255)'),
+            new BoardCircle(0, 6, this.baseRadiusSize),
+            new BoardCircle(3, 6, this.baseRadiusSize),
+            new BoardCircle(6, 6, this.baseRadiusSize),
         ];
     }
 
@@ -85,12 +85,13 @@ export class AppComponent implements AfterViewInit {
         this.initCircles();
         this.drawBoard();
         this.addCanvasOnClickListener();
+        this.addCanvasOnMouseMoveListener();
     }
 
     initializePlayersPieces(): void {
         for (let i = 0; i < this.piecesPerPlayer; ++i) {
-            this.redPieces.push(new Circle(null, null, this.baseRadiusSize * 2, 'rgba(180,0,0,255)'));
-            this.greenPieces.push(new Circle(null, null, this.baseRadiusSize * 2, 'rgba(0,100,0,255)'));
+            this.redPieces.push(new RedPiece(null, null, this.baseRadiusSize * 2));
+            this.greenPieces.push(new GreenPiece(null, null, this.baseRadiusSize * 2));
         }
     }
 
@@ -106,35 +107,69 @@ export class AppComponent implements AfterViewInit {
         });
     }
 
-    performNormalMove(relativePosition: IPosition, pixel: string): void {
-        this.circles.forEach(circle => {
-            if (this.canvasService.isIntersect(relativePosition, circle)) {
-                if (circle.color === 'rgba(' + pixel + ')') {
-                    if (this.turn === Turn.RED) {
-                        this.setAvailablePiece(this.redPieces, circle);
-                    } else {
-                        this.setAvailablePiece(this.greenPieces, circle);
-                    }
+    addCanvasOnMouseMoveListener(): void {
+        this.canvas.addEventListener('mousemove', (mouseEvent) => {
+            const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
+            const pixel = this.canvasService.getPixel(relativePosition);
+            if (this.moveType === MoveType.NORMAL) {
+                if (this.findCircleOnBoardForNormalMove(relativePosition, pixel)) {
+                    this.canvas.style.cursor = 'pointer';
+                } else {
+                    this.canvas.style.cursor = 'default';
+                }
+            } else if (this.moveType === MoveType.REMOVE) {
+                if (this.findIntersectingPieceForRemove(relativePosition)) {
+                    this.canvas.style.cursor = 'pointer';
+                } else {
+                    this.canvas.style.cursor = 'default';
                 }
             }
         });
     }
 
-    performRemoveMove(relativePosition: IPosition): void {
+    performNormalMove(relativePosition: IPosition, pixel: string): void {
+        const foundCircle = this.findCircleOnBoardForNormalMove(relativePosition, pixel);
+        if (foundCircle) {
+            if (this.turn === Turn.RED) {
+                this.setAvailablePiece(this.redPieces, foundCircle);
+            } else {
+                this.setAvailablePiece(this.greenPieces, foundCircle);
+            }
+        }
+    }
+
+    findCircleOnBoardForNormalMove(relativePosition: IPosition, pixel: string): ICircle {
+        for (const circle of this.circles) {
+            if (this.canvasService.isIntersect(relativePosition, circle)) {
+                if (circle.color === 'rgba(' + pixel + ')') {
+                    return circle;
+                }
+            }
+        }
+        return null;
+    }
+
+    findIntersectingPieceForRemove(relativePosition: IPosition): ICircle {
+        let pieces: ICircle[];
+
         if (this.turn === Turn.GREEN) {
-            const foundPiece = this.findIntersectingPiece(this.redPieces, relativePosition);
-            if (foundPiece) {
-                this.redPieces = this.redPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
-                this.moveType = MoveType.NORMAL;
-                this.changeTurn();
-            }
+            pieces = this.redPieces;
         } else {
-            const foundPiece = this.findIntersectingPiece(this.greenPieces, relativePosition);
-            if (foundPiece) {
+            pieces = this.greenPieces;
+        }
+        return this.findIntersectingPiece(pieces, relativePosition);
+    }
+
+    performRemoveMove(relativePosition: IPosition): void {
+        const foundPiece = this.findIntersectingPieceForRemove(relativePosition);
+        if (foundPiece) {
+            if (foundPiece instanceof RedPiece) {
+                this.redPieces = this.redPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
+            } else {
                 this.greenPieces = this.greenPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
-                this.moveType = MoveType.NORMAL;
-                this.changeTurn();
             }
+            this.moveType = MoveType.NORMAL;
+            this.changeTurn();
         }
     }
 
