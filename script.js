@@ -1,4 +1,11 @@
 const canvas = document.getElementById('canvas');
+const turn = document.getElementById('turn');
+const availableReds = document.getElementById('available-reds');
+const availableGreens = document.getElementById('available-greens');
+const usedReds = document.getElementById('used-reds');
+const usedGreens = document.getElementById('used-greens');
+const move = document.getElementById('move-type');
+
 const ctx = canvas.getContext('2d');
 const baseSize = canvas.width / 8;
 const offset = baseSize;
@@ -9,8 +16,8 @@ const moveTypes = {
     REMOVE: 'remove'
 };
 let moveType = 'normal';
-const redPieces = [];
-const greenPieces = [];
+let redPieces = [];
+let greenPieces = [];
 
 const circles = [
     {x: 0, y: 0, radius: baseRadiusSize, color: 'rgba(0,0,0,255)'},
@@ -86,6 +93,15 @@ function drawBoard() {
 
     redPieces.filter(piece => piece.x != null && piece.y != null).forEach(filteredPiece => drawCircle(filteredPiece));
     greenPieces.filter(piece => piece.x != null && piece.y != null).forEach(filteredPiece => drawCircle(filteredPiece));
+
+    turn.innerText = isRedPlayerTurn ? 'RED' : 'GREEN';
+    availableReds.innerText = redPieces.filter(piece => piece.x == null && piece.y == null).length;
+    availableGreens.innerText = greenPieces.filter(piece => piece.x == null && piece.y == null).length;
+
+    usedReds.innerText = redPieces.filter(piece => piece.x != null && piece.y != null).length;
+    usedGreens.innerText = greenPieces.filter(piece => piece.x != null && piece.y != null).length;
+
+    move.innerText = moveType;
 }
 
 function getMousePos(evt) {
@@ -110,7 +126,7 @@ function setAvailablePiece(pieces, circle) {
     if (foundPiece) {
         foundPiece.x = circle.x;
         foundPiece.y = circle.y;
-        if(checkForMill(pieces, foundPiece)){
+        if (checkForMill(pieces, foundPiece)) {
             moveType = moveTypes.REMOVE;
         }
         drawBoard();
@@ -140,12 +156,21 @@ function checkForMill(pieces, newPiece) {
     return false;
 }
 
+function findIntersectingPiece(pieces, relativePosition) {
+    for (let piece of pieces) {
+        if (isIntersect(relativePosition, piece)) {
+            return piece;
+        }
+    }
+    return null;
+}
+
 (function main() {
-    drawBoard();
     for (let i = 0; i < 15; ++i) {
         redPieces.push({x: null, y: null, radius: baseRadiusSize * 2, color: 'rgba(180,0,0,255)'});
         greenPieces.push({x: null, y: null, radius: baseRadiusSize * 2, color: 'rgba(0,100,0,255)'});
     }
+    drawBoard();
 
     canvas.addEventListener('click', (e) => {
         const relativePosition = getMousePos(e);
@@ -164,20 +189,29 @@ function checkForMill(pieces, newPiece) {
                 }
             });
         } else if (moveType === moveTypes.REMOVE) {
-            let pieces = [];
             if (isRedPlayerTurn) {
-                pieces = redPieces;
-            } else {
-                pieces = greenPieces;
-            }
-            pieces.forEach(piece => {
-                if (isIntersect(relativePosition, piece)) {
-                    piece.x = null;
-                    piece.y = null;
+                const foundPiece = findIntersectingPiece(redPieces, relativePosition);
+                if (foundPiece) {
+                    redPieces = redPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
                     moveType = moveTypes.NORMAL;
                     drawBoard();
                 }
-            })
+            } else {
+                const foundPiece = findIntersectingPiece(greenPieces, relativePosition);
+                if (foundPiece) {
+                    greenPieces = greenPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
+                    moveType = moveTypes.NORMAL;
+                    drawBoard();
+                }
+            }
+            // pieces.forEach(piece => {
+            //     if (isIntersect(relativePosition, piece)) {
+            //         piece.x = null;
+            //         piece.y = null;
+            //         moveType = moveTypes.NORMAL;
+            //         drawBoard();
+            //     }
+            // })
         }
     });
 })();
