@@ -84,6 +84,8 @@ THE SOFTWARE.
 
 @angular/material/card
 
+@angular/material/grid-list
+
 @angular/platform-browser
 MIT
 
