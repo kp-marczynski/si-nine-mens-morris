@@ -283,51 +283,52 @@ export class GameComponent implements AfterViewInit {
     }
 
     putPieceOnBoard(circle: ICircle): void {
-        this.highlightedCircles = [];
-        const drawerService = this.getDrawerServiceForCurrentPlayer();
-
-        let movePossible: boolean = false;
-
-        if (drawerService.getNumberOfAvailablePieces() > 0) {
-            drawerService.decreaseNumberOfAvailablePieces();
-            movePossible = true;
-        }
-        if (this.chosenForShift) {
-            this.chosenForShift.changeColor(Color.BLACK);
-            this.chosenForShift = null;
-            movePossible = true;
-        }
-        if (movePossible && circle == this.getLastMove()) {
-            movePossible = false;
+        if (circle == this.getLastMove()) {
             alert('You cant put piece on last used position');
             this.drawBoard();
-        }
+        } else {
+            this.highlightedCircles = [];
+            const drawerService = this.getDrawerServiceForCurrentPlayer();
 
-        if (movePossible) {
-            circle.changeColor(this.turn);
-            this.setLastMove(circle);
+            let movePossible: boolean = false;
 
-            const pieces = this.circles.filter(c => c.color === this.turn);
-            const mill = this.checkForMill(pieces, circle);
+            if (drawerService.getNumberOfAvailablePieces() > 0) {
+                drawerService.decreaseNumberOfAvailablePieces();
+                movePossible = true;
+            }
+            if (this.chosenForShift) {
+                this.chosenForShift.changeColor(Color.BLACK);
+                this.chosenForShift = null;
+                movePossible = true;
+            }
 
-            switch (mill) {
-                case 1:
-                    this.moveType = MoveType.REMOVE_OPPONENT;
-                    this.drawBoard();
-                    break;
-                case 2:
-                    this.moveType = MoveType.REMOVE_OPPONENT_2;
-                    this.drawBoard();
-                    break;
-                default:
-                    this.changeTurn();
-                    break;
+
+            if (movePossible) {
+                circle.changeColor(this.turn);
+                this.setLastMove(circle);
+
+                const pieces = this.circles.filter(c => c.color === this.turn);
+                const mill = this.checkForMill(pieces, circle);
+
+                switch (mill) {
+                    case 1:
+                        this.moveType = MoveType.REMOVE_OPPONENT;
+                        this.drawBoard();
+                        break;
+                    case 2:
+                        this.moveType = MoveType.REMOVE_OPPONENT_2;
+                        this.drawBoard();
+                        break;
+                    default:
+                        this.changeTurn();
+                        break;
+                }
             }
         }
     }
 
     setLastMove(circle: ICircle) {
-        switch (this.turn) {
+        switch (circle.color) {
             case Color.RED:
                 this.lastRed = circle;
                 break;
