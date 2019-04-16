@@ -69,6 +69,6 @@ export class CanvasService {
         }
 
         return Math.sqrt((point.x - this.getRealCoordinate(circle.x)) ** 2
-            + (point.y - this.getRealCoordinate(circle.y)) ** 2) < circle.radius;
+            + (point.y - this.getRealCoordinate(circle.y)) ** 2) < circle.radius * 2;
     }
 }
