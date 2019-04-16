@@ -5,6 +5,8 @@ export interface IPlayerState {
     usedPieces: number;
 
     lastPosition: ICircle;
+
+    decreaseNumberOfAvailablePieces(): void;
 }
 
 export class PlayerState implements IPlayerState {
@@ -14,6 +16,11 @@ export class PlayerState implements IPlayerState {
     lastPosition: ICircle;
 
     constructor() {
+        this.availablePieces = 9;
+    }
+
+    decreaseNumberOfAvailablePieces(): void {
+        this.availablePieces--;
     }
 
 }

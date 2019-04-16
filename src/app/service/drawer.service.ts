@@ -5,7 +5,7 @@ export class DrawerService {
 
     canvasService: CanvasService;
 
-    constructor(private canvas: HTMLCanvasElement, private baseSize: number, private offset: number, private numberOfPieces, private color: Color, private radiusSize: number) {
+    constructor(private canvas: HTMLCanvasElement, private baseSize: number, private offset: number, public numberOfPieces, private color: Color, private radiusSize: number) {
         this.canvasService = new CanvasService(canvas, baseSize, offset);
         this.canvas.width = this.offset + this.baseSize * 3;
     }
@@ -17,13 +17,5 @@ export class DrawerService {
         for (let i = 0; i < this.numberOfPieces; ++i) {
             this.canvasService.drawBasicCircleInCoords(i % 3, Math.floor(i / 3), this.radiusSize, this.color);
         }
-    }
-
-    public getNumberOfAvailablePieces(): number {
-        return this.numberOfPieces;
-    }
-
-    decreaseNumberOfAvailablePieces(): void {
-        this.numberOfPieces--;
     }
 }
