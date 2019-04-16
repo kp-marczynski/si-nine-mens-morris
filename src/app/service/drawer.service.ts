@@ -12,6 +12,8 @@ export class DrawerService {
     drawDrawer() {
         this.canvasService.clearCanvas();
         this.canvas.height = this.offset + this.baseSize * Math.ceil(this.numberOfPieces / 3);
+        this.canvas.width = this.offset + this.baseSize * Math.ceil(this.numberOfPieces / 3);
+
         for (let i = 0; i < this.numberOfPieces; ++i) {
             this.canvasService.drawBasicCircleInCoords(i % 3, Math.floor(i / 3), this.radiusSize, this.color);
         }

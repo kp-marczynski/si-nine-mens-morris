@@ -5,6 +5,7 @@ import {CanvasService} from './service/canvas.service';
 import {IPosition} from './model/position.model';
 import {Color, getOpponentColor} from "./model/color.enum";
 import {DrawerService} from "./service/drawer.service";
+import {getWinSize, isBigScreen} from "./service/window-size.service";
 
 @Component({
     selector: 'app-root',
@@ -40,13 +41,31 @@ export class GameComponent implements AfterViewInit {
 
     afterVieInitCallback(): void {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        if (!isBigScreen()) {
+            this.canvas.width = 0.8 * getWinSize();
+            this.canvas.height = 0.8 * getWinSize();
+        } else {
+            this.canvas.width = 500;
+            this.canvas.height = 500;
+        }
+
         this.baseSize = this.canvas.width / 8;
         this.offset = this.baseSize;
         this.baseRadiusSize = this.baseSize / 6;
         this.canvasService = new CanvasService(this.canvas, this.baseSize, this.offset);
 
-        this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement, 50, 50, this.piecesPerPlayer, Color.RED, 2 * this.baseRadiusSize);
-        this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement, 50, 50, this.piecesPerPlayer, Color.GREEN, 2 * this.baseRadiusSize);
+        this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement,
+            this.baseSize,
+            this.offset,
+            this.piecesPerPlayer,
+            Color.RED,
+            2 * this.baseRadiusSize);
+        this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement,
+            this.baseSize,
+            this.offset,
+            this.piecesPerPlayer,
+            Color.GREEN,
+            2 * this.baseRadiusSize);
 
         this.initCircles();
         this.drawBoard();

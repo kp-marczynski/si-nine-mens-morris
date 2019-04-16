@@ -1,3 +1,21 @@
+<h1>{{turn}} : {{moveType}}</h1>
+<div class="game-wrapper">
+    <mat-card class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="canvas" width="500" height="500">></canvas>
+    </mat-card>
+        <mat-grid-list cols="2">
+            <mat-grid-tile>
+                <mat-card class="canvas-wrapper">
+                    <canvas id="red-drawer" width="200" height="300"></canvas>
+                </mat-card>
+            </mat-grid-tile>
+            <mat-grid-tile>
+                <mat-card class="canvas-wrapper">
+                    <canvas id="green-drawer" width="200" height="300"></canvas>
+                </mat-card>
+            </mat-grid-tile>
+        </mat-grid-list>
+</div>
 <mat-card class="score-board">
     <table>
         <tr>
@@ -9,8 +27,8 @@
             <td>{{moveType}}</td>
         </tr>
         <!--<tr>-->
-            <!--<td>Total reds:</td>-->
-            <!--<td>{{redPieces.length}}</td>-->
+        <!--<td>Total reds:</td>-->
+        <!--<td>{{redPieces.length}}</td>-->
         <!--</tr>-->
         <tr>
             <td>Available reds:</td>
@@ -21,8 +39,8 @@
             <td>{{usedReds}}</td>
         </tr>
         <!--<tr>-->
-            <!--<td>Total greens:</td>-->
-            <!--<td>{{greenPieces.length}}</td>-->
+        <!--<td>Total greens:</td>-->
+        <!--<td>{{greenPieces.length}}</td>-->
         <!--</tr>-->
         <tr>
             <td>Available greens:</td>
@@ -34,26 +52,3 @@
         </tr>
     </table>
 </mat-card>
-<h1>{{turn}} : {{moveType}}</h1>
-<div class="game-wrapper">
-    <mat-grid-list cols="5" rowHeight="550px">
-        <mat-grid-tile>
-            <mat-card class="canvas-wrapper">
-                <canvas id="red-drawer" width="200" height="300"></canvas>
-            </mat-card>
-        </mat-grid-tile>
-        <mat-grid-tile [colspan]="3">
-            <mat-card class="canvas-wrapper" id="canvas-wrapper">
-                <canvas id="canvas" width="500" height="500">></canvas>
-            </mat-card>
-        </mat-grid-tile>
-        <mat-grid-tile>
-            <mat-card class="canvas-wrapper">
-                <canvas id="green-drawer" width="200" height="300"></canvas>
-            </mat-card>
-        </mat-grid-tile>
-        <!--<mat-grid-tile>3</mat-grid-tile>-->
-        <!--<mat-grid-tile>4</mat-grid-tile>-->
-    </mat-grid-list>
-
-</div>

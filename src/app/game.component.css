@@ -4,19 +4,16 @@ mat-card {
 
 .score-board {
     width: 300px;
-    position: fixed;
 }
 
 .canvas-wrapper {
-    margin: 1rem auto;
-    width: 500px;
-    /*height: 500px;*/
+    margin: 2rem auto;
+    max-width: 500px;
 }
 
 .game-wrapper {
     margin: auto;
-    padding-top: 10rem;
-    max-width: 1280px;
+    max-width: 600px;
 }
 
 canvas {
