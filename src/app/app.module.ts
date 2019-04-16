@@ -1,14 +1,14 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
-import {AppComponent} from './app.component';
+import {GameComponent} from './game.component';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {MatCardModule} from '@angular/material/card';
 import {MatGridListModule} from '@angular/material/grid-list';
 
 @NgModule({
     declarations: [
-        AppComponent
+        GameComponent
     ],
     imports: [
         BrowserModule,
@@ -17,7 +17,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
         MatGridListModule
     ],
     providers: [],
-    bootstrap: [AppComponent]
+    bootstrap: [GameComponent]
 })
 export class AppModule {
 }

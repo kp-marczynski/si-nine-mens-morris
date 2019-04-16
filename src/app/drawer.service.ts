@@ -1,5 +1,5 @@
 import {CanvasService} from "./canvas.service";
-import {Color, getColorRgbaString} from "./color.enum";
+import {Color} from "./color.enum";
 
 export class DrawerService {
 

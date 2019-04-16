@@ -3,15 +3,15 @@ import {Circle, ICircle} from './circle.model';
 import {MoveType} from './move-type.enum';
 import {CanvasService} from './canvas.service';
 import {IPosition} from './position.model';
-import {Color, getColorRgbaString} from "./color.enum";
+import {Color, getOpponentColor} from "./color.enum";
 import {DrawerService} from "./drawer.service";
 
 @Component({
     selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
+    templateUrl: './game.component.html',
+    styleUrls: ['./game.component.css'],
 })
-export class AppComponent implements AfterViewInit {
+export class GameComponent implements AfterViewInit {
     canvas: HTMLCanvasElement;
     availableReds: number;
     availableGreens: number;
@@ -59,7 +59,8 @@ export class AppComponent implements AfterViewInit {
     initCircles() {
         for (let x = 0; x < this.boardSize; ++x) {
             for (let y = 0; y < this.boardSize; ++y) {
-                if ((Math.abs(x - 3) === Math.abs(y - 3) || x === 3 || y === 3) && !(x === 3 && y === 3)) {
+                if ((Math.abs(x - 3) === Math.abs(y - 3) || x === 3 || y === 3)
+                    && !(x === 3 && y === 3)) {
                     this.circles.push(new Circle(x, y, this.baseRadiusSize));
                 }
             }
@@ -96,7 +97,7 @@ export class AppComponent implements AfterViewInit {
                     break;
                 case MoveType.REMOVE_OPPONENT:
                 case MoveType.REMOVE_OPPONENT_2:
-                    circleFound = this.findIntersectingPieceForRemove(relativePosition) != null;
+                    circleFound = this.findCircleOnBoardForRemove(relativePosition) != null;
                     break;
                 case MoveType.MOVE_NEARBY:
                 case MoveType.MOVE_ANYWHERE:
@@ -114,39 +115,12 @@ export class AppComponent implements AfterViewInit {
     performNormalMove(relativePosition: IPosition): void {
         const foundCircle = this.findCircleOnBoardForNormalMove(relativePosition);
         if (foundCircle) {
-            if (this.turn === Color.RED) {
-                this.setAvailablePiece(this.redDrawerService, foundCircle);
-            } else {
-                this.setAvailablePiece(this.greenDrawerService, foundCircle);
-            }
-        }
-    }
-
-    findCircleOnBoardForNormalMove(relativePosition: IPosition): ICircle {
-        for (const circle of this.circles.filter(circle => circle.color === Color.BLACK)) {
-            if (this.canvasService.isIntersect(relativePosition, circle)) {
-                return circle;
-            }
-        }
-        return null;
-    }
-
-    findIntersectingPieceForRemove(relativePosition: IPosition): ICircle {
-        let pieces: ICircle[] = this.circles.filter(piece => piece.color === this.getOpponentColor());
-        return this.findIntersectingPiece(pieces, relativePosition);
-    }
-
-    getOpponentColor(): Color {
-        switch (this.turn) {
-            case Color.RED:
-                return Color.GREEN;
-            case Color.GREEN:
-                return Color.RED;
+            this.putPieceOnBoard(foundCircle);
         }
     }
 
     performRemoveMove(relativePosition: IPosition): void {
-        const foundPiece = this.findIntersectingPieceForRemove(relativePosition);
+        const foundPiece = this.findCircleOnBoardForRemove(relativePosition);
         if (foundPiece && foundPiece.x != null && foundPiece.y != null) {
             foundPiece.changeColor(Color.BLACK);
             if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
@@ -157,6 +131,34 @@ export class AppComponent implements AfterViewInit {
                 this.changeTurn();
             }
         }
+    }
+
+    performNearbyMove(relativePosition: IPosition): void {
+        //todo
+    }
+
+    performAnywhereMove(relativePosition: IPosition): void {
+        //todo
+    }
+
+    findCircleOnBoardForNormalMove(relativePosition: IPosition): ICircle {
+        const pieces: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK);
+        return this.findIntersectingPiece(pieces, relativePosition);
+    }
+
+    findCircleOnBoardForRemove(relativePosition: IPosition): ICircle {
+        let pieces: ICircle[] = this.circles.filter(piece => piece.color === getOpponentColor(this.turn));
+        return this.findIntersectingPiece(pieces, relativePosition);
+    }
+
+    findCircleOnBoardForNearbyMove(relativePosition: IPosition): ICircle {
+        //todo
+        return null;
+    }
+
+    findCircleOnBoardForAnywhereMove(relativePosition: IPosition): ICircle {
+        //todo
+        return null;
     }
 
     drawBoard(): void {
@@ -173,22 +175,29 @@ export class AppComponent implements AfterViewInit {
             this.canvasService.drawCircle(circle);
         });
 
-        this.availableReds = this.redDrawerService.getNumberOfAvailablePieces();
-        this.availableGreens = this.greenDrawerService.getNumberOfAvailablePieces();
-
-        this.usedReds = this.circles.filter(piece => piece.color === Color.RED).length;
-        this.usedGreens = this.circles.filter(piece => piece.color === Color.GREEN).length;
+        this.calculateStats();
 
         this.redDrawerService.drawDrawer();
         this.greenDrawerService.drawDrawer();
     }
 
-    setAvailablePiece(drawerService: DrawerService, circle: ICircle): void {
+    calculateStats() {
+        this.availableReds = this.redDrawerService.getNumberOfAvailablePieces();
+        this.availableGreens = this.greenDrawerService.getNumberOfAvailablePieces();
+
+        this.usedReds = this.circles.filter(piece => piece.color === Color.RED).length;
+        this.usedGreens = this.circles.filter(piece => piece.color === Color.GREEN).length;
+    }
+
+    putPieceOnBoard(circle: ICircle): void {
+        const drawerService = this.getDrawerServiceForCurrentPlayer();
         if (drawerService.getNumberOfAvailablePieces() > 0) {
             circle.changeColor(this.turn);
             drawerService.decreaseNumberOfAvailablePieces();
+
             const pieces = this.circles.filter(c => c.color === this.turn);
             const mill = this.checkForMill(pieces, circle);
+
             switch (mill) {
                 case 1:
                     this.moveType = MoveType.REMOVE_OPPONENT;
@@ -205,12 +214,17 @@ export class AppComponent implements AfterViewInit {
         }
     }
 
-    changeTurn() {
-        if (this.turn === Color.RED) {
-            this.turn = Color.GREEN;
-        } else {
-            this.turn = Color.RED;
+    getDrawerServiceForCurrentPlayer(): DrawerService {
+        switch (this.turn) {
+            case Color.RED:
+                return this.redDrawerService;
+            case Color.GREEN:
+                return this.greenDrawerService;
         }
+    }
+
+    changeTurn() {
+        this.turn = getOpponentColor(this.turn);
         this.adjustMoveType();
         this.drawBoard();
     }

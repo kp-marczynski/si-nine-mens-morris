@@ -12,3 +12,12 @@ export function getColorRgbaString(color: Color): string {
             return 'rgba(0,0,0,255)';
     }
 }
+
+export function getOpponentColor(turn: Color): Color {
+    switch (turn) {
+        case Color.RED:
+            return Color.GREEN;
+        case Color.GREEN:
+            return Color.RED;
+    }
+}
