@@ -1,10 +1,10 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {Circle, ICircle} from './circle.model';
-import {MoveType} from './move-type.enum';
-import {CanvasService} from './canvas.service';
-import {IPosition} from './position.model';
-import {Color, getOpponentColor} from "./color.enum";
-import {DrawerService} from "./drawer.service";
+import {Circle, ICircle} from './model/circle.model';
+import {MoveType} from './model/move-type.enum';
+import {CanvasService} from './service/canvas.service';
+import {IPosition} from './model/position.model';
+import {Color, getOpponentColor} from "./model/color.enum";
+import {DrawerService} from "./service/drawer.service";
 
 @Component({
     selector: 'app-root',

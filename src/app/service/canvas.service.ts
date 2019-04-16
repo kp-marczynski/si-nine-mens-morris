@@ -1,6 +1,6 @@
-import {IPosition, Position} from './position.model';
-import {ICircle} from './circle.model';
-import {Color, getColorRgbaString} from "./color.enum";
+import {IPosition, Position} from '../model/position.model';
+import {ICircle} from '../model/circle.model';
+import {Color, getColorRgbaString} from "../model/color.enum";
 
 export class CanvasService {
 
