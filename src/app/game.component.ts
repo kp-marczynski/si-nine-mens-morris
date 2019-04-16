@@ -226,15 +226,15 @@ export class GameComponent implements AfterViewInit {
                 }
             } else if (chosenCircle.x == this.boardCenter) {
                 if ((circle.y == chosenCircle.y
-                    && (circle.x == chosenCircle.x + Math.abs(3 - chosenCircle.y) || circle.x == chosenCircle.x - Math.abs(3 - chosenCircle.y))
-                ) || (circle.x == 3 && (circle.y == chosenCircle.y + 1 || circle.y == chosenCircle.y - 1))) {
+                    && (circle.x == chosenCircle.x + Math.abs(this.boardCenter - chosenCircle.y) || circle.x == chosenCircle.x - Math.abs(this.boardCenter - chosenCircle.y))
+                ) || (circle.x == this.boardCenter && (circle.y == chosenCircle.y + 1 || circle.y == chosenCircle.y - 1))) {
                     this.highlightedCircles.push(new HighlightedCircle(circle));
                 }
 
             } else if (chosenCircle.y == this.boardCenter) {
                 if ((circle.x == chosenCircle.x
-                    && (circle.y == chosenCircle.y + Math.abs(3 - chosenCircle.x) || circle.y == chosenCircle.y - Math.abs(3 - chosenCircle.x))
-                ) || (circle.y == 3 && (circle.x == chosenCircle.x + 1 || circle.x == chosenCircle.x - 1))) {
+                    && (circle.y == chosenCircle.y + Math.abs(this.boardCenter - chosenCircle.x) || circle.y == chosenCircle.y - Math.abs(this.boardCenter - chosenCircle.x))
+                ) || (circle.y == this.boardCenter && (circle.x == chosenCircle.x + 1 || circle.x == chosenCircle.x - 1))) {
                     this.highlightedCircles.push(new HighlightedCircle(circle));
                 }
             }
