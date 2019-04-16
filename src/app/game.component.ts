@@ -12,6 +12,11 @@ import {DrawerService} from "./drawer.service";
     styleUrls: ['./game.component.css'],
 })
 export class GameComponent implements AfterViewInit {
+    turn: Color = Color.RED;
+    moveType: MoveType = MoveType.NORMAL;
+    piecesPerPlayer = 9;
+    boardSize = 7;
+
     canvas: HTMLCanvasElement;
     availableReds: number;
     availableGreens: number;
@@ -22,19 +27,12 @@ export class GameComponent implements AfterViewInit {
 
     offset: number;
     baseRadiusSize: number;
-    turn: Color = Color.RED;
-    moveType: MoveType = MoveType.NORMAL;
-
     circles: ICircle[] = [];
-
-    piecesPerPlayer = 9;
 
     canvasService: CanvasService;
 
     redDrawerService: DrawerService;
     greenDrawerService: DrawerService;
-
-    boardSize = 7;
 
     ngAfterViewInit(): void {
         setTimeout(() => this.afterVieInitCallback());
