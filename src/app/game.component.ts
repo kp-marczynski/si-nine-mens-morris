@@ -172,7 +172,7 @@ export class GameComponent implements AfterViewInit {
 
         if (circleForShift) {
             this.chosenForShift = circleForShift;
-            this.findCirclesForNearbyMove(circleForShift);
+            this.highlightedCircles = this.findCirclesForNearbyMove(circleForShift);
             this.drawBoard();
 
         } else {
@@ -188,7 +188,7 @@ export class GameComponent implements AfterViewInit {
 
         if (circleForShift) {
             this.chosenForShift = circleForShift;
-            this.findCirclesOnBoardForAnywhereMove(circleForShift);
+            this.highlightedCircles = this.findCirclesOnBoardForAnywhereMove(circleForShift);
             this.drawBoard();
 
         } else {
@@ -200,14 +200,14 @@ export class GameComponent implements AfterViewInit {
     }
 
     findCircleOnBoardForNormalMove(relativePosition: IPosition): ICircle {
-        const pieces: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK);
+        let lastMove = this.getLastMove();
+        const pieces: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK && !(circle.x == lastMove.x && circle.y == lastMove.y));
         return this.findIntersectingPiece(pieces, relativePosition);
     }
 
     findHighlightedCircle(relativePosition: IPosition): ICircle {
         return this.findIntersectingPiece(this.highlightedCircles, relativePosition);
     }
-
 
     findCircleOnBoardForRemove(relativePosition: IPosition): ICircle {
         let pieces: ICircle[] = this.circles.filter(piece => piece.color === getOpponentColor(this.turn));
@@ -221,38 +221,38 @@ export class GameComponent implements AfterViewInit {
 
     findCirclesForNearbyMove(chosenCircle: ICircle): ICircle[] {
         const foundCircles: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK);
-        this.highlightedCircles = [];
+        const result = [];
 
         for (const circle of foundCircles) {
             if (Math.abs(this.boardCenter - chosenCircle.x) == Math.abs(this.boardCenter - chosenCircle.y)) {
                 if ((circle.x == chosenCircle.x && circle.y == this.boardCenter) || (circle.x == this.boardCenter && circle.y == chosenCircle.y)) {
-                    this.highlightedCircles.push(new HighlightedCircle(circle));
+                    result.push(new HighlightedCircle(circle));
                 }
             } else if (chosenCircle.x == this.boardCenter) {
                 if ((circle.y == chosenCircle.y
                     && (circle.x == chosenCircle.x + Math.abs(this.boardCenter - chosenCircle.y) || circle.x == chosenCircle.x - Math.abs(this.boardCenter - chosenCircle.y))
                 ) || (circle.x == this.boardCenter && (circle.y == chosenCircle.y + 1 || circle.y == chosenCircle.y - 1))) {
-                    this.highlightedCircles.push(new HighlightedCircle(circle));
+                    result.push(new HighlightedCircle(circle));
                 }
 
             } else if (chosenCircle.y == this.boardCenter) {
                 if ((circle.x == chosenCircle.x
                     && (circle.y == chosenCircle.y + Math.abs(this.boardCenter - chosenCircle.x) || circle.y == chosenCircle.y - Math.abs(this.boardCenter - chosenCircle.x))
                 ) || (circle.y == this.boardCenter && (circle.x == chosenCircle.x + 1 || circle.x == chosenCircle.x - 1))) {
-                    this.highlightedCircles.push(new HighlightedCircle(circle));
+                    result.push(new HighlightedCircle(circle));
                 }
             }
         }
-        return this.highlightedCircles;
+        return result;
     }
 
     findCirclesOnBoardForAnywhereMove(chosenCircle: ICircle): ICircle[] {
         const foundCircles: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK);
-        this.highlightedCircles = [];
+        const result = [];
         for (const circle of foundCircles) {
-            this.highlightedCircles.push(new HighlightedCircle(circle));
+            result.push(new HighlightedCircle(circle));
         }
-        return this.highlightedCircles;
+        return result;
     }
 
     drawBoard(): void {
@@ -377,14 +377,29 @@ export class GameComponent implements AfterViewInit {
         const allPieces = usedPieces + availablePieces;
 
         if (allPieces < 3) {
+            this.moveType = MoveType.END_GAME;
             alert("Player " + this.turn + " has lost");
         } else if (availablePieces > 0) {
             this.moveType = MoveType.NORMAL;
         } else if (usedPieces === 3) {
-            this.moveType = MoveType.MOVE_ANYWHERE;
+            if (this.checkIfAnyCanMoveNearby()) {
+                this.moveType = MoveType.MOVE_ANYWHERE;
+            } else {
+                this.moveType = MoveType.END_GAME;
+            }
         } else if (availablePieces === 0) {
             this.moveType = MoveType.MOVE_NEARBY;
         }
+    }
+
+    checkIfAnyCanMoveNearby(): boolean {
+        let currentPlayerPieces = this.circles.filter(circle => circle.color == this.turn);
+        for (const piece of currentPlayerPieces) {
+            if (this.findCirclesForNearbyMove(piece).length > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     checkForMill(pieces: ICircle[], newPiece: ICircle): number {
