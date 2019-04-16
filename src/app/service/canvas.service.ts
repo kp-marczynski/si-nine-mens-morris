@@ -39,8 +39,12 @@ export class CanvasService {
         const finalX = this.getRealCoordinate(x);
         const finalY = this.getRealCoordinate(y);
         this.ctx.arc(finalX, finalY, radius, 0, 2 * Math.PI);
-        this.ctx.fillStyle = getColorRgbaString(color);
-        this.ctx.fill();
+        if (color != Color.NONE) {
+            this.ctx.fillStyle = getColorRgbaString(color);
+            this.ctx.fill();
+        } else {
+            this.ctx.stroke();
+        }
     }
 
     public clearCanvas(): void {

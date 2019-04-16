@@ -32,3 +32,23 @@ export class Circle implements ICircle {
     }
 
 }
+
+export class HighlightedCircle implements ICircle {
+    color = Color.NONE;
+    radius: number;
+    x: number;
+    y: number;
+
+    constructor(
+        circle: ICircle
+    ) {
+        this.x = circle.x;
+        this.y = circle.y;
+        this.radius = circle.radius * 2;
+    }
+
+    changeColor(color: Color): void {
+    }
+
+
+}

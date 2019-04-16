@@ -7,7 +7,7 @@ export class DrawerService {
 
     constructor(private canvas: HTMLCanvasElement, private baseSize: number, private offset: number, private numberOfPieces, private color: Color, private radiusSize: number) {
         this.canvasService = new CanvasService(canvas, baseSize, offset);
-        this.canvas.width = this.offset + this.baseSize * Math.ceil(this.numberOfPieces / 3);
+        this.canvas.width = this.offset + this.baseSize * 3;
     }
 
     drawDrawer() {

@@ -1,5 +1,5 @@
 export enum Color {
-    RED = 'RED', GREEN = 'GREEN', BLACK = 'BLACK'
+    RED = 'RED', GREEN = 'GREEN', BLACK = 'BLACK', NONE = 'NONE'
 }
 
 export function getColorRgbaString(color: Color): string {
@@ -10,6 +10,8 @@ export function getColorRgbaString(color: Color): string {
             return 'rgba(0,100,0,255)';
         case Color.BLACK:
             return 'rgba(0,0,0,255)';
+        case Color.NONE:
+            return '';
     }
 }
 
