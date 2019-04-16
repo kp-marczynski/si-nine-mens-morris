@@ -3,7 +3,8 @@ import {BoardCircle, GreenPiece, ICircle, RedPiece} from './circle.model';
 import {MoveType} from './move-type.enum';
 import {CanvasService} from './canvas.service';
 import {IPosition} from './position.model';
-import {Turn} from "./turn.enum";
+import {Color, getColorRgbaString} from "./color.enum";
+import {DrawerService} from "./drawer.service";
 
 @Component({
     selector: 'app-root',
@@ -21,10 +22,8 @@ export class AppComponent implements AfterViewInit {
 
     offset: number;
     baseRadiusSize: number;
-    turn: Turn = Turn.RED;
+    turn: Color = Color.RED;
     moveType: MoveType = MoveType.NORMAL;
-    redPieces: ICircle[] = [];
-    greenPieces: ICircle[] = [];
 
     circles: ICircle[] = [];
 
@@ -32,43 +31,19 @@ export class AppComponent implements AfterViewInit {
 
     canvasService: CanvasService;
 
-    redDrawerCanvasService: CanvasService;
-    greenDrawerCanvasService: CanvasService;
+    redDrawerService: DrawerService;
+    greenDrawerService: DrawerService;
+
+    boardSize = 7;
 
     initCircles() {
-        this.circles = [
-            new BoardCircle(0, 0, this.baseRadiusSize),
-            new BoardCircle(3, 0, this.baseRadiusSize),
-            new BoardCircle(6, 0, this.baseRadiusSize),
-
-            new BoardCircle(1, 1, this.baseRadiusSize),
-            new BoardCircle(3, 1, this.baseRadiusSize),
-            new BoardCircle(5, 1, this.baseRadiusSize),
-
-            new BoardCircle(2, 2, this.baseRadiusSize),
-            new BoardCircle(3, 2, this.baseRadiusSize),
-            new BoardCircle(4, 2, this.baseRadiusSize),
-
-            new BoardCircle(0, 3, this.baseRadiusSize),
-            new BoardCircle(1, 3, this.baseRadiusSize),
-            new BoardCircle(2, 3, this.baseRadiusSize),
-
-            new BoardCircle(4, 3, this.baseRadiusSize),
-            new BoardCircle(5, 3, this.baseRadiusSize),
-            new BoardCircle(6, 3, this.baseRadiusSize),
-
-            new BoardCircle(2, 4, this.baseRadiusSize),
-            new BoardCircle(3, 4, this.baseRadiusSize),
-            new BoardCircle(4, 4, this.baseRadiusSize),
-
-            new BoardCircle(1, 5, this.baseRadiusSize),
-            new BoardCircle(3, 5, this.baseRadiusSize),
-            new BoardCircle(5, 5, this.baseRadiusSize),
-
-            new BoardCircle(0, 6, this.baseRadiusSize),
-            new BoardCircle(3, 6, this.baseRadiusSize),
-            new BoardCircle(6, 6, this.baseRadiusSize),
-        ];
+        for (let x = 0; x < this.boardSize; ++x) {
+            for (let y = 0; y < this.boardSize; ++y) {
+                if ((Math.abs(x - 3) === Math.abs(y - 3) || x === 3 || y === 3) && !(x === 3 && y === 3)) {
+                    this.circles.push(new BoardCircle(x, y, this.baseRadiusSize));
+                }
+            }
+        }
     }
 
     ngAfterViewInit(): void {
@@ -82,10 +57,8 @@ export class AppComponent implements AfterViewInit {
         this.baseRadiusSize = this.baseSize / 6;
         this.canvasService = new CanvasService(this.canvas, this.baseSize, this.offset);
 
-        this.redDrawerCanvasService = new CanvasService(document.getElementById('red-drawer') as HTMLCanvasElement, 50, 50);
-        this.greenDrawerCanvasService = new CanvasService(document.getElementById('green-drawer') as HTMLCanvasElement, 50, 50);
-
-        this.initializePlayersPieces();
+        this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement, 50, 50, this.piecesPerPlayer, Color.RED, 2 * this.baseRadiusSize);
+        this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement, 50, 50, this.piecesPerPlayer, Color.GREEN, 2 * this.baseRadiusSize);
 
         this.initCircles();
         this.drawBoard();
@@ -93,12 +66,6 @@ export class AppComponent implements AfterViewInit {
         this.addCanvasOnMouseMoveListener();
     }
 
-    initializePlayersPieces(): void {
-        for (let i = 0; i < this.piecesPerPlayer; ++i) {
-            this.redPieces.push(new RedPiece(null, null, this.baseRadiusSize * 2));
-            this.greenPieces.push(new GreenPiece(null, null, this.baseRadiusSize * 2));
-        }
-    }
 
     addCanvasOnClickListener(): void {
         this.canvas.addEventListener('click', (mouseEvent) => {
@@ -120,6 +87,7 @@ export class AppComponent implements AfterViewInit {
             }
         });
     }
+
     addCanvasOnMouseMoveListener(): void {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
             const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
@@ -143,10 +111,10 @@ export class AppComponent implements AfterViewInit {
     performNormalMove(relativePosition: IPosition, pixel: string): void {
         const foundCircle = this.findCircleOnBoardForNormalMove(relativePosition, pixel);
         if (foundCircle) {
-            if (this.turn === Turn.RED) {
-                this.setAvailablePiece(this.redPieces, foundCircle);
+            if (this.turn === Color.RED) {
+                this.setAvailablePiece(this.redDrawerService, foundCircle);
             } else {
-                this.setAvailablePiece(this.greenPieces, foundCircle);
+                this.setAvailablePiece(this.greenDrawerService, foundCircle);
             }
         }
     }
@@ -154,7 +122,7 @@ export class AppComponent implements AfterViewInit {
     findCircleOnBoardForNormalMove(relativePosition: IPosition, pixel: string): ICircle {
         for (const circle of this.circles) {
             if (this.canvasService.isIntersect(relativePosition, circle)) {
-                if (circle.color === 'rgba(' + pixel + ')') {
+                if (getColorRgbaString(Color.BLACK) === 'rgba(' + pixel + ')') {
                     return circle;
                 }
             }
@@ -165,22 +133,19 @@ export class AppComponent implements AfterViewInit {
     findIntersectingPieceForRemove(relativePosition: IPosition): ICircle {
         let pieces: ICircle[];
 
-        if (this.turn === Turn.GREEN) {
-            pieces = this.redPieces;
+        if (this.turn === Color.GREEN) {
+            pieces = this.circles.filter(piece => piece instanceof RedPiece);
         } else {
-            pieces = this.greenPieces;
+            pieces = this.circles.filter(piece => piece instanceof GreenPiece);
         }
         return this.findIntersectingPiece(pieces, relativePosition);
     }
 
     performRemoveMove(relativePosition: IPosition): void {
         const foundPiece = this.findIntersectingPieceForRemove(relativePosition);
-        if (foundPiece) {
-            if (foundPiece instanceof RedPiece) {
-                this.redPieces = this.redPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
-            } else {
-                this.greenPieces = this.greenPieces.filter(piece => piece.x !== foundPiece.x || piece.y !== foundPiece.y);
-            }
+        if (foundPiece && foundPiece.x != null && foundPiece.y != null) {
+            this.circles = this.circles.filter(circle => circle.x != foundPiece.x || circle.y != foundPiece.y);
+            this.circles.push(new BoardCircle(foundPiece.x, foundPiece.y, this.baseRadiusSize));
             if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
                 this.moveType = MoveType.REMOVE_OPPONENT;
                 this.drawBoard();
@@ -205,42 +170,34 @@ export class AppComponent implements AfterViewInit {
             this.canvasService.drawCircle(circle);
         });
 
-        this.redPieces.filter(piece => piece.x != null && piece.y != null)
-            .forEach(filteredPiece => this.canvasService.drawCircle(filteredPiece));
-        this.greenPieces.filter(piece => piece.x != null && piece.y != null)
-            .forEach(filteredPiece => this.canvasService.drawCircle(filteredPiece));
+        this.availableReds = this.redDrawerService.getNumberOfAvailablePieces();
+        this.availableGreens = this.greenDrawerService.getNumberOfAvailablePieces();
 
-        this.availableReds = this.redPieces.filter(piece => piece.x == null && piece.y == null).length;
-        this.availableGreens = this.greenPieces.filter(piece => piece.x == null && piece.y == null).length;
+        this.usedReds = this.circles.filter(piece => piece instanceof RedPiece).length;
+        this.usedGreens = this.circles.filter(piece => piece instanceof GreenPiece).length;
 
-        this.usedReds = this.redPieces.filter(piece => piece.x != null && piece.y != null).length;
-        this.usedGreens = this.greenPieces.filter(piece => piece.x != null && piece.y != null).length;
-
-        this.drawRedDrawer();
-        this.drawGreenDrawer();
+        this.redDrawerService.drawDrawer();
+        this.greenDrawerService.drawDrawer();
     }
 
-    drawRedDrawer() {
-        this.redDrawerCanvasService.clearCanvas();
-        let circlesForDrawer = this.redPieces.filter(piece => piece.x == null && piece.y == null);
-        for (let i = 0; i < circlesForDrawer.length; ++i) {
-            this.redDrawerCanvasService.drawCircleInCoords(circlesForDrawer[i], i % 3, Math.floor(i / 3));
+    getNewPieceForColor(color: Color) {
+        switch (color) {
+            case Color.RED:
+                return new RedPiece(null, null, 2 * this.baseRadiusSize);
+            case Color.GREEN:
+                return new GreenPiece(null, null, 2 * this.baseRadiusSize);
         }
     }
 
-    drawGreenDrawer() {
-        this.greenDrawerCanvasService.clearCanvas();
-        let circlesForDrawer = this.greenPieces.filter(piece => piece.x == null && piece.y == null);
-        for (let i = 0; i < circlesForDrawer.length; ++i) {
-            this.greenDrawerCanvasService.drawCircleInCoords(circlesForDrawer[i], i % 3, Math.floor(i / 3));
-        }
-    }
-
-    setAvailablePiece(pieces: ICircle[], circle: ICircle): void {
-        const foundPiece = pieces.find(piece => piece.x == null && piece.y == null);
-        if (foundPiece) {
+    setAvailablePiece(drawerService: DrawerService, circle: ICircle): void {
+        if (drawerService.getNumberOfAvailablePieces() > 0) {
+            this.circles = this.circles.filter(c => c.x != circle.x || c.y != circle.y);
+            const foundPiece = this.getNewPieceForColor(this.turn);
             foundPiece.x = circle.x;
             foundPiece.y = circle.y;
+            this.circles.push(foundPiece);
+            drawerService.decreaseNumberOfAvailablePieces();
+            const pieces = this.circles.filter(c => c.color === foundPiece.color);
             const mill = this.checkForMill(pieces, foundPiece);
             switch (mill) {
                 case 1:
@@ -259,10 +216,10 @@ export class AppComponent implements AfterViewInit {
     }
 
     changeTurn() {
-        if (this.turn === Turn.RED) {
-            this.turn = Turn.GREEN;
+        if (this.turn === Color.RED) {
+            this.turn = Color.GREEN;
         } else {
-            this.turn = Turn.RED;
+            this.turn = Color.RED;
         }
         this.adjustMoveType();
         this.drawBoard();
@@ -271,12 +228,12 @@ export class AppComponent implements AfterViewInit {
     adjustMoveType() {
         let numberOfAvailablePieces = 0;
         let numberOfAllPieces = 0;
-        if (this.turn === Turn.RED) {
-            numberOfAllPieces = this.redPieces.length;
-            numberOfAvailablePieces = this.redPieces.filter(piece => piece.x === null && piece.y === null).length;
+        if (this.turn === Color.RED) {
+            numberOfAllPieces = this.usedReds + this.availableReds;
+            numberOfAvailablePieces = this.availableReds;
         } else {
-            numberOfAllPieces = this.greenPieces.length;
-            numberOfAvailablePieces = this.greenPieces.filter(piece => piece.x === null && piece.y === null).length;
+            numberOfAllPieces = this.usedGreens + this.availableGreens;
+            numberOfAvailablePieces = this.availableGreens;
         }
 
         if (numberOfAllPieces < 3) {

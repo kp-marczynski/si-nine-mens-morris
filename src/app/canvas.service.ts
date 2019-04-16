@@ -1,5 +1,6 @@
 import {IPosition, Position} from './position.model';
 import {ICircle} from './circle.model';
+import {Color, getColorRgbaString} from "./color.enum";
 
 export class CanvasService {
 
@@ -30,11 +31,15 @@ export class CanvasService {
     }
 
     public drawCircleInCoords(circle: ICircle, x: number, y: number) {
+        this.drawBasicCircleInCoords(x, y, circle.radius, circle.color);
+    }
+
+    public drawBasicCircleInCoords(x: number, y: number, radius: number, color: Color) {
         this.ctx.beginPath();
         const finalX = this.getRealCoordinate(x);
         const finalY = this.getRealCoordinate(y);
-        this.ctx.arc(finalX, finalY, circle.radius, 0, 2 * Math.PI);
-        this.ctx.fillStyle = circle.color;
+        this.ctx.arc(finalX, finalY, radius, 0, 2 * Math.PI);
+        this.ctx.fillStyle = getColorRgbaString(color);
         this.ctx.fill();
     }
 
