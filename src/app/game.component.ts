@@ -1,36 +1,28 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Circle, HighlightedCircle, ICircle} from './model/circle.model';
 import {MoveType} from './model/move-type.enum';
 import {CanvasService} from './service/canvas.service';
-import {IPosition} from './model/position.model';
+import {IPosition, Position} from './model/position.model';
 import {Color, getOpponentColor} from "./model/color.enum";
 import {DrawerService} from "./service/drawer.service";
 import {getWinSize, isBigScreen} from "./service/window-size.service";
+import {GameState, IGameState} from "./model/game-state.model";
 
 @Component({
     selector: 'app-root',
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.css'],
 })
-export class GameComponent implements AfterViewInit {
-    turn: Color = Color.RED;
-    moveType: MoveType = MoveType.NORMAL;
+export class GameComponent implements AfterViewInit, OnInit {
     piecesPerPlayer = 9;
     boardSize = 7;
     boardCenter = 3;
 
-    canvas: HTMLCanvasElement;
-    availableReds: number;
-    availableGreens: number;
-    usedReds: number;
-    usedGreens: number;
-
     baseSize: number;
-
     offset: number;
     baseRadiusSize: number;
-    circles: ICircle[] = [];
 
+    canvas: HTMLCanvasElement;
     canvasService: CanvasService;
 
     redDrawerService: DrawerService;
@@ -39,8 +31,11 @@ export class GameComponent implements AfterViewInit {
     highlightedCircles: ICircle[] = [];
     chosenForShift: ICircle = null;
 
-    lastRed: ICircle = null;
-    lastGreen: ICircle = null;
+    gameState: IGameState = null;
+
+    ngOnInit(): void {
+        this.gameState = new GameState();
+    }
 
     ngAfterViewInit(): void {
         setTimeout(() => this.afterVieInitCallback());
@@ -86,7 +81,7 @@ export class GameComponent implements AfterViewInit {
             for (let y = 0; y < this.boardSize; ++y) {
                 if ((Math.abs(x - this.boardCenter) === Math.abs(y - this.boardCenter) || x === this.boardCenter || y === this.boardCenter)
                     && !(x === this.boardCenter && y === this.boardCenter)) {
-                    this.circles.push(new Circle(x, y, this.baseRadiusSize));
+                    this.gameState.circles.push(new Circle(x, y, this.baseRadiusSize));
                 }
             }
         }
@@ -103,7 +98,7 @@ export class GameComponent implements AfterViewInit {
     onClickOrTouchListener(event: UIEvent) {
         const relativePosition = this.canvasService.getPositionInCanvas(event);
         event.preventDefault();
-        switch (this.moveType) {
+        switch (this.gameState.moveType) {
             case MoveType.NORMAL:
                 this.performNormalMove(relativePosition);
                 break;
@@ -124,7 +119,7 @@ export class GameComponent implements AfterViewInit {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
             const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
             let circleFound = false;
-            switch (this.moveType) {
+            switch (this.gameState.moveType) {
                 case MoveType.NORMAL:
                     circleFound = this.findCircleOnBoardForNormalMove(relativePosition) != null;
                     break;
@@ -158,8 +153,8 @@ export class GameComponent implements AfterViewInit {
         if (foundPiece && foundPiece.x != null && foundPiece.y != null) {
             foundPiece.changeColor(Color.BLACK);
             this.setLastMove(foundPiece);
-            if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
-                this.moveType = MoveType.REMOVE_OPPONENT;
+            if (this.gameState.moveType === MoveType.REMOVE_OPPONENT_2) {
+                this.gameState.moveType = MoveType.REMOVE_OPPONENT;
                 this.drawBoard();
             } else {
                 this.changeTurn();
@@ -178,7 +173,7 @@ export class GameComponent implements AfterViewInit {
         } else {
             const foundCircle = this.findHighlightedCircle(relativePosition);
             if (foundCircle) {
-                this.putPieceOnBoard(this.circles.find(circle => circle.x == foundCircle.x && circle.y == foundCircle.y));
+                this.putPieceOnBoard(this.gameState.circles.find(circle => circle.x == foundCircle.x && circle.y == foundCircle.y));
             }
         }
     }
@@ -194,14 +189,17 @@ export class GameComponent implements AfterViewInit {
         } else {
             const foundCircle = this.findHighlightedCircle(relativePosition);
             if (foundCircle) {
-                this.putPieceOnBoard(this.circles.find(circle => circle.x == foundCircle.x && circle.y == foundCircle.y));
+                this.putPieceOnBoard(this.gameState.circles.find(circle => circle.x == foundCircle.x && circle.y == foundCircle.y));
             }
         }
     }
 
     findCircleOnBoardForNormalMove(relativePosition: IPosition): ICircle {
+        let pieces: ICircle[] = this.gameState.circles.filter(circle => circle.color === Color.BLACK);
         let lastMove = this.getLastMove();
-        const pieces: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK && !(circle.x == lastMove.x && circle.y == lastMove.y));
+        if (lastMove) {
+            pieces = pieces.filter(circle => !(circle.x == lastMove.x && circle.y == lastMove.y));
+        }
         return this.findIntersectingPiece(pieces, relativePosition);
     }
 
@@ -210,17 +208,17 @@ export class GameComponent implements AfterViewInit {
     }
 
     findCircleOnBoardForRemove(relativePosition: IPosition): ICircle {
-        let pieces: ICircle[] = this.circles.filter(piece => piece.color === getOpponentColor(this.turn));
+        let pieces: ICircle[] = this.gameState.circles.filter(piece => piece.color === getOpponentColor(this.gameState.turn));
         return this.findIntersectingPiece(pieces, relativePosition);
     }
 
     findCircleOnBoardForShift(relativePosition: IPosition): ICircle {
-        let pieces: ICircle[] = this.circles.filter(piece => piece.color === this.turn);
+        let pieces: ICircle[] = this.gameState.circles.filter(piece => piece.color === this.gameState.turn);
         return this.findIntersectingPiece(pieces, relativePosition);
     }
 
     findCirclesForNearbyMove(chosenCircle: ICircle): ICircle[] {
-        const foundCircles: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK);
+        const foundCircles: ICircle[] = this.gameState.circles.filter(circle => circle.color === Color.BLACK);
         const result = [];
 
         for (const circle of foundCircles) {
@@ -247,7 +245,7 @@ export class GameComponent implements AfterViewInit {
     }
 
     findCirclesOnBoardForAnywhereMove(chosenCircle: ICircle): ICircle[] {
-        const foundCircles: ICircle[] = this.circles.filter(circle => circle.color === Color.BLACK);
+        const foundCircles: ICircle[] = this.gameState.circles.filter(circle => circle.color === Color.BLACK);
         const result = [];
         for (const circle of foundCircles) {
             result.push(new HighlightedCircle(circle));
@@ -265,7 +263,7 @@ export class GameComponent implements AfterViewInit {
         this.canvasService.drawLine(3, 0, 3, 2);
         this.canvasService.drawLine(3, 4, 3, 6);
 
-        this.circles.forEach(circle => this.canvasService.drawCircle(circle));
+        this.gameState.circles.forEach(circle => this.canvasService.drawCircle(circle));
         this.highlightedCircles.forEach(circle => this.canvasService.drawCircle(circle));
 
         this.calculateStats();
@@ -275,11 +273,11 @@ export class GameComponent implements AfterViewInit {
     }
 
     calculateStats() {
-        this.availableReds = this.redDrawerService.getNumberOfAvailablePieces();
-        this.availableGreens = this.greenDrawerService.getNumberOfAvailablePieces();
+        this.gameState.redPlayerState.availablePieces = this.redDrawerService.getNumberOfAvailablePieces();
+        this.gameState.greenPlayerState.availablePieces = this.greenDrawerService.getNumberOfAvailablePieces();
 
-        this.usedReds = this.circles.filter(piece => piece.color === Color.RED).length;
-        this.usedGreens = this.circles.filter(piece => piece.color === Color.GREEN).length;
+        this.gameState.redPlayerState.usedPieces = this.gameState.circles.filter(piece => piece.color === Color.RED).length;
+        this.gameState.greenPlayerState.usedPieces = this.gameState.circles.filter(piece => piece.color === Color.GREEN).length;
     }
 
     putPieceOnBoard(circle: ICircle): void {
@@ -304,19 +302,19 @@ export class GameComponent implements AfterViewInit {
 
 
             if (movePossible) {
-                circle.changeColor(this.turn);
+                circle.changeColor(this.gameState.turn);
                 this.setLastMove(circle);
 
-                const pieces = this.circles.filter(c => c.color === this.turn);
+                const pieces = this.gameState.circles.filter(c => c.color === this.gameState.turn);
                 const mill = this.checkForMill(pieces, circle);
 
                 switch (mill) {
                     case 1:
-                        this.moveType = MoveType.REMOVE_OPPONENT;
+                        this.gameState.moveType = MoveType.REMOVE_OPPONENT;
                         this.drawBoard();
                         break;
                     case 2:
-                        this.moveType = MoveType.REMOVE_OPPONENT_2;
+                        this.gameState.moveType = MoveType.REMOVE_OPPONENT_2;
                         this.drawBoard();
                         break;
                     default:
@@ -330,25 +328,25 @@ export class GameComponent implements AfterViewInit {
     setLastMove(circle: ICircle) {
         switch (circle.color) {
             case Color.RED:
-                this.lastRed = circle;
+                this.gameState.redPlayerState.lastPosition = circle;
                 break;
             case Color.GREEN:
-                this.lastGreen = circle;
+                this.gameState.greenPlayerState.lastPosition = circle;
                 break;
         }
     }
 
-    getLastMove(): ICircle {
-        switch (this.turn) {
+    getLastMove(): IPosition {
+        switch (this.gameState.turn) {
             case Color.RED:
-                return this.lastRed;
+                return this.gameState.redPlayerState.lastPosition;
             case Color.GREEN:
-                return this.lastGreen;
+                return this.gameState.greenPlayerState.lastPosition;
         }
     }
 
     getDrawerServiceForCurrentPlayer(): DrawerService {
-        switch (this.turn) {
+        switch (this.gameState.turn) {
             case Color.RED:
                 return this.redDrawerService;
             case Color.GREEN:
@@ -357,7 +355,7 @@ export class GameComponent implements AfterViewInit {
     }
 
     changeTurn() {
-        this.turn = getOpponentColor(this.turn);
+        this.gameState.turn = getOpponentColor(this.gameState.turn);
         this.setMoveType();
         this.drawBoard();
     }
@@ -366,34 +364,34 @@ export class GameComponent implements AfterViewInit {
         this.calculateStats();
         let availablePieces = 0;
         let usedPieces = 0;
-        if (this.turn === Color.RED) {
-            usedPieces = this.usedReds;
-            availablePieces = this.availableReds;
+        if (this.gameState.turn === Color.RED) {
+            usedPieces = this.gameState.redPlayerState.usedPieces;
+            availablePieces = this.gameState.redPlayerState.availablePieces;
         } else {
-            usedPieces = this.usedGreens;
-            availablePieces = this.availableGreens;
+            usedPieces = this.gameState.greenPlayerState.usedPieces;
+            availablePieces = this.gameState.greenPlayerState.availablePieces;
         }
 
         const allPieces = usedPieces + availablePieces;
 
         if (allPieces < 3) {
-            this.moveType = MoveType.END_GAME;
-            alert("Player " + this.turn + " has lost");
+            this.gameState.moveType = MoveType.END_GAME;
+            alert("Player " + this.gameState.turn + " has lost");
         } else if (availablePieces > 0) {
-            this.moveType = MoveType.NORMAL;
+            this.gameState.moveType = MoveType.NORMAL;
         } else if (usedPieces === 3) {
             if (this.checkIfAnyCanMoveNearby()) {
-                this.moveType = MoveType.MOVE_ANYWHERE;
+                this.gameState.moveType = MoveType.MOVE_ANYWHERE;
             } else {
-                this.moveType = MoveType.END_GAME;
+                this.gameState.moveType = MoveType.END_GAME;
             }
         } else if (availablePieces === 0) {
-            this.moveType = MoveType.MOVE_NEARBY;
+            this.gameState.moveType = MoveType.MOVE_NEARBY;
         }
     }
 
     checkIfAnyCanMoveNearby(): boolean {
-        let currentPlayerPieces = this.circles.filter(circle => circle.color == this.turn);
+        let currentPlayerPieces = this.gameState.circles.filter(circle => circle.color == this.gameState.turn);
         for (const piece of currentPlayerPieces) {
             if (this.findCirclesForNearbyMove(piece).length > 0) {
                 return true;

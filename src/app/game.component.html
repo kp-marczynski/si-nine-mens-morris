@@ -1,8 +1,9 @@
-<h1>{{turn}} : {{moveType}}</h1>
-<div class="game-wrapper">
-    <mat-card class="canvas-wrapper" id="canvas-wrapper">
-        <canvas id="canvas" width="500" height="500">></canvas>
-    </mat-card>
+<div *ngIf="gameState">
+    <h1>{{gameState.turn}} : {{gameState.moveType}}</h1>
+    <div class="game-wrapper">
+        <mat-card class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="canvas" width="500" height="500">></canvas>
+        </mat-card>
         <mat-grid-list cols="2">
             <mat-grid-tile>
                 <mat-card class="canvas-wrapper">
@@ -15,40 +16,41 @@
                 </mat-card>
             </mat-grid-tile>
         </mat-grid-list>
+    </div>
+    <mat-card class="score-board">
+        <table>
+            <tr>
+                <td>Turn:</td>
+                <td>{{gameState.turn}}</td>
+            </tr>
+            <tr>
+                <td>Move type:</td>
+                <td>{{gameState.moveType}}</td>
+            </tr>
+            <!--<tr>-->
+            <!--<td>Total reds:</td>-->
+            <!--<td>{{redPieces.length}}</td>-->
+            <!--</tr>-->
+            <tr>
+                <td>Available reds:</td>
+                <td>{{gameState.redPlayerState.availablePieces}}</td>
+            </tr>
+            <tr>
+                <td>Used reds:</td>
+                <td>{{gameState.redPlayerState.usedPieces}}</td>
+            </tr>
+            <!--<tr>-->
+            <!--<td>Total greens:</td>-->
+            <!--<td>{{greenPieces.length}}</td>-->
+            <!--</tr>-->
+            <tr>
+                <td>Available greens:</td>
+                <td>{{gameState.greenPlayerState.availablePieces}}</td>
+            </tr>
+            <tr>
+                <td>Used greens:</td>
+                <td>{{gameState.greenPlayerState.usedPieces}}</td>
+            </tr>
+        </table>
+    </mat-card>
 </div>
-<mat-card class="score-board">
-    <table>
-        <tr>
-            <td>Turn:</td>
-            <td>{{turn}}</td>
-        </tr>
-        <tr>
-            <td>Move type:</td>
-            <td>{{moveType}}</td>
-        </tr>
-        <!--<tr>-->
-        <!--<td>Total reds:</td>-->
-        <!--<td>{{redPieces.length}}</td>-->
-        <!--</tr>-->
-        <tr>
-            <td>Available reds:</td>
-            <td>{{availableReds}}</td>
-        </tr>
-        <tr>
-            <td>Used reds:</td>
-            <td>{{usedReds}}</td>
-        </tr>
-        <!--<tr>-->
-        <!--<td>Total greens:</td>-->
-        <!--<td>{{greenPieces.length}}</td>-->
-        <!--</tr>-->
-        <tr>
-            <td>Available greens:</td>
-            <td>{{availableGreens}}</td>
-        </tr>
-        <tr>
-            <td>Used greens:</td>
-            <td>{{usedGreens}}</td>
-        </tr>
-    </table>
-</mat-card>
