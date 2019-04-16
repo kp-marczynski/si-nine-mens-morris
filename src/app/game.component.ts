@@ -39,6 +39,9 @@ export class GameComponent implements AfterViewInit {
     highlightedCircles: ICircle[] = [];
     chosenForShift: ICircle = null;
 
+    lastRed: ICircle = null;
+    lastGreen: ICircle = null;
+
     ngAfterViewInit(): void {
         setTimeout(() => this.afterVieInitCallback());
     }
@@ -154,6 +157,7 @@ export class GameComponent implements AfterViewInit {
         const foundPiece = this.findCircleOnBoardForRemove(relativePosition);
         if (foundPiece && foundPiece.x != null && foundPiece.y != null) {
             foundPiece.changeColor(Color.BLACK);
+            this.setLastMove(foundPiece);
             if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
                 this.moveType = MoveType.REMOVE_OPPONENT;
                 this.drawBoard();
@@ -293,9 +297,15 @@ export class GameComponent implements AfterViewInit {
             this.chosenForShift = null;
             movePossible = true;
         }
+        if (movePossible && circle == this.getLastMove()) {
+            movePossible = false;
+            alert('You cant put piece on last used position');
+            this.drawBoard();
+        }
+
         if (movePossible) {
             circle.changeColor(this.turn);
-
+            this.setLastMove(circle);
 
             const pieces = this.circles.filter(c => c.color === this.turn);
             const mill = this.checkForMill(pieces, circle);
@@ -316,6 +326,26 @@ export class GameComponent implements AfterViewInit {
         }
     }
 
+    setLastMove(circle: ICircle) {
+        switch (this.turn) {
+            case Color.RED:
+                this.lastRed = circle;
+                break;
+            case Color.GREEN:
+                this.lastGreen = circle;
+                break;
+        }
+    }
+
+    getLastMove(): ICircle {
+        switch (this.turn) {
+            case Color.RED:
+                return this.lastRed;
+            case Color.GREEN:
+                return this.lastGreen;
+        }
+    }
+
     getDrawerServiceForCurrentPlayer(): DrawerService {
         switch (this.turn) {
             case Color.RED:
@@ -333,23 +363,25 @@ export class GameComponent implements AfterViewInit {
 
     setMoveType() {
         this.calculateStats();
-        let numberOfAvailablePieces = 0;
-        let numberOfAllPieces = 0;
+        let availablePieces = 0;
+        let usedPieces = 0;
         if (this.turn === Color.RED) {
-            numberOfAllPieces = this.usedReds + this.availableReds;
-            numberOfAvailablePieces = this.availableReds;
+            usedPieces = this.usedReds;
+            availablePieces = this.availableReds;
         } else {
-            numberOfAllPieces = this.usedGreens + this.availableGreens;
-            numberOfAvailablePieces = this.availableGreens;
+            usedPieces = this.usedGreens;
+            availablePieces = this.availableGreens;
         }
 
-        if (numberOfAllPieces < 3) {
+        const allPieces = usedPieces + availablePieces;
+
+        if (allPieces < 3) {
             alert("Player " + this.turn + " has lost");
-        } else if (numberOfAvailablePieces > 3) {
+        } else if (availablePieces > 0) {
             this.moveType = MoveType.NORMAL;
-        } else if (numberOfAllPieces === 3) {
+        } else if (usedPieces === 3) {
             this.moveType = MoveType.MOVE_ANYWHERE;
-        } else if (numberOfAvailablePieces === 0) {
+        } else if (availablePieces === 0) {
             this.moveType = MoveType.MOVE_NEARBY;
         }
     }
