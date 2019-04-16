@@ -47,8 +47,12 @@ export class CanvasService {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    public getPixel(relativePosition: IPosition): string {
-        return this.ctx.getImageData(relativePosition.x, relativePosition.y, 1, 1).data.toString();
+    public getPositionInCanvas(event: UIEvent) {
+        if (event instanceof MouseEvent) {
+            return this.getMousePositionInCanvas(event as MouseEvent);
+        } else {
+            return this.getTouchPositionInCanvas(event as TouchEvent);
+        }
     }
 
     public getMousePositionInCanvas(evt: MouseEvent): IPosition {
@@ -56,6 +60,14 @@ export class CanvasService {
         return new Position(
             evt.clientX - rect.left,
             evt.clientY - rect.top
+        );
+    }
+
+    public getTouchPositionInCanvas(evt: TouchEvent): IPosition {
+        const rect = this.canvas.getBoundingClientRect();
+        return new Position(
+            evt.touches[0].clientX - rect.left,
+            evt.touches[0].clientY - rect.top
         );
     }
 

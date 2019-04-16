@@ -71,6 +71,7 @@ export class GameComponent implements AfterViewInit {
         this.drawBoard();
         this.addCanvasOnClickListener();
         this.addCanvasOnMouseMoveListener();
+        this.addCanvasOnTouchListener();
     }
 
     initCircles() {
@@ -84,24 +85,30 @@ export class GameComponent implements AfterViewInit {
         }
     }
 
+    addCanvasOnTouchListener(): void {
+        this.canvas.addEventListener('touchstart', (touchEvent) => this.onClickOrTouchListener(touchEvent));
+    }
+
     addCanvasOnClickListener(): void {
-        this.canvas.addEventListener('click', (mouseEvent) => {
-            const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
+        this.canvas.addEventListener('click', (mouseEvent) => this.onClickOrTouchListener(mouseEvent));
+    }
 
-            switch (this.moveType) {
-                case MoveType.NORMAL:
-                    this.performNormalMove(relativePosition);
-                    break;
-                case MoveType.REMOVE_OPPONENT:
-                case MoveType.REMOVE_OPPONENT_2:
-                    this.performRemoveMove(relativePosition);
-                    break;
-                case MoveType.MOVE_NEARBY:
-                case MoveType.MOVE_ANYWHERE:
-                    alert("State not implemented yet"); // todo
+    onClickOrTouchListener(event: UIEvent) {
+        const relativePosition = this.canvasService.getPositionInCanvas(event);
+        event.preventDefault();
+        switch (this.moveType) {
+            case MoveType.NORMAL:
+                this.performNormalMove(relativePosition);
+                break;
+            case MoveType.REMOVE_OPPONENT:
+            case MoveType.REMOVE_OPPONENT_2:
+                this.performRemoveMove(relativePosition);
+                break;
+            case MoveType.MOVE_NEARBY:
+            case MoveType.MOVE_ANYWHERE:
+                alert("State not implemented yet"); // todo
 
-            }
-        });
+        }
     }
 
     addCanvasOnMouseMoveListener(): void {
