@@ -5,9 +5,11 @@ export interface ICircle {
     y: number;
     radius: number;
     color: Color;
+
+    changeColor(color: Color): void;
 }
 
-export class BoardCircle implements ICircle {
+export class Circle implements ICircle {
     color = Color.BLACK;
 
     constructor(
@@ -17,26 +19,16 @@ export class BoardCircle implements ICircle {
     ) {
     }
 
-}
-
-export class RedPiece implements ICircle {
-    color = Color.RED;
-
-    constructor(
-        public x: number,
-        public y: number,
-        public radius: number
-    ) {
+    changeColor(color: Color): void {
+        let radiusFactor = 1;
+        if (this.color == Color.BLACK && color != Color.BLACK) {
+            radiusFactor = 2;
+        }
+        if (color == Color.BLACK && this.color != Color.BLACK) {
+            radiusFactor = 0.5;
+        }
+        this.radius *= radiusFactor;
+        this.color = color;
     }
-}
 
-export class GreenPiece implements ICircle {
-    color = Color.GREEN;
-
-    constructor(
-        public x: number,
-        public y: number,
-        public radius: number
-    ) {
-    }
 }

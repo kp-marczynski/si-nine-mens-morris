@@ -1,5 +1,5 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {BoardCircle, GreenPiece, ICircle, RedPiece} from './circle.model';
+import {Circle, ICircle} from './circle.model';
 import {MoveType} from './move-type.enum';
 import {CanvasService} from './canvas.service';
 import {IPosition} from './position.model';
@@ -36,16 +36,6 @@ export class AppComponent implements AfterViewInit {
 
     boardSize = 7;
 
-    initCircles() {
-        for (let x = 0; x < this.boardSize; ++x) {
-            for (let y = 0; y < this.boardSize; ++y) {
-                if ((Math.abs(x - 3) === Math.abs(y - 3) || x === 3 || y === 3) && !(x === 3 && y === 3)) {
-                    this.circles.push(new BoardCircle(x, y, this.baseRadiusSize));
-                }
-            }
-        }
-    }
-
     ngAfterViewInit(): void {
         setTimeout(() => this.afterVieInitCallback());
     }
@@ -66,15 +56,23 @@ export class AppComponent implements AfterViewInit {
         this.addCanvasOnMouseMoveListener();
     }
 
+    initCircles() {
+        for (let x = 0; x < this.boardSize; ++x) {
+            for (let y = 0; y < this.boardSize; ++y) {
+                if ((Math.abs(x - 3) === Math.abs(y - 3) || x === 3 || y === 3) && !(x === 3 && y === 3)) {
+                    this.circles.push(new Circle(x, y, this.baseRadiusSize));
+                }
+            }
+        }
+    }
 
     addCanvasOnClickListener(): void {
         this.canvas.addEventListener('click', (mouseEvent) => {
             const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
-            const pixel = this.canvasService.getPixel(relativePosition);
 
             switch (this.moveType) {
                 case MoveType.NORMAL:
-                    this.performNormalMove(relativePosition, pixel);
+                    this.performNormalMove(relativePosition);
                     break;
                 case MoveType.REMOVE_OPPONENT:
                 case MoveType.REMOVE_OPPONENT_2:
@@ -91,25 +89,30 @@ export class AppComponent implements AfterViewInit {
     addCanvasOnMouseMoveListener(): void {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
             const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
-            const pixel = this.canvasService.getPixel(relativePosition);
-            if (this.moveType === MoveType.NORMAL) {
-                if (this.findCircleOnBoardForNormalMove(relativePosition, pixel)) {
-                    this.canvas.style.cursor = 'pointer';
-                } else {
-                    this.canvas.style.cursor = 'default';
-                }
-            } else if (this.moveType === MoveType.REMOVE_OPPONENT) {
-                if (this.findIntersectingPieceForRemove(relativePosition)) {
-                    this.canvas.style.cursor = 'pointer';
-                } else {
-                    this.canvas.style.cursor = 'default';
-                }
+            let circleFound = false;
+            switch (this.moveType) {
+                case MoveType.NORMAL:
+                    circleFound = this.findCircleOnBoardForNormalMove(relativePosition) != null;
+                    break;
+                case MoveType.REMOVE_OPPONENT:
+                case MoveType.REMOVE_OPPONENT_2:
+                    circleFound = this.findIntersectingPieceForRemove(relativePosition) != null;
+                    break;
+                case MoveType.MOVE_NEARBY:
+                case MoveType.MOVE_ANYWHERE:
+                    break;
+            }
+
+            if (circleFound) {
+                this.canvas.style.cursor = 'pointer';
+            } else {
+                this.canvas.style.cursor = 'default';
             }
         });
     }
 
-    performNormalMove(relativePosition: IPosition, pixel: string): void {
-        const foundCircle = this.findCircleOnBoardForNormalMove(relativePosition, pixel);
+    performNormalMove(relativePosition: IPosition): void {
+        const foundCircle = this.findCircleOnBoardForNormalMove(relativePosition);
         if (foundCircle) {
             if (this.turn === Color.RED) {
                 this.setAvailablePiece(this.redDrawerService, foundCircle);
@@ -119,33 +122,33 @@ export class AppComponent implements AfterViewInit {
         }
     }
 
-    findCircleOnBoardForNormalMove(relativePosition: IPosition, pixel: string): ICircle {
-        for (const circle of this.circles) {
+    findCircleOnBoardForNormalMove(relativePosition: IPosition): ICircle {
+        for (const circle of this.circles.filter(circle => circle.color === Color.BLACK)) {
             if (this.canvasService.isIntersect(relativePosition, circle)) {
-                if (getColorRgbaString(Color.BLACK) === 'rgba(' + pixel + ')') {
-                    return circle;
-                }
+                return circle;
             }
         }
         return null;
     }
 
     findIntersectingPieceForRemove(relativePosition: IPosition): ICircle {
-        let pieces: ICircle[];
-
-        if (this.turn === Color.GREEN) {
-            pieces = this.circles.filter(piece => piece instanceof RedPiece);
-        } else {
-            pieces = this.circles.filter(piece => piece instanceof GreenPiece);
-        }
+        let pieces: ICircle[] = this.circles.filter(piece => piece.color === this.getOpponentColor());
         return this.findIntersectingPiece(pieces, relativePosition);
+    }
+
+    getOpponentColor(): Color {
+        switch (this.turn) {
+            case Color.RED:
+                return Color.GREEN;
+            case Color.GREEN:
+                return Color.RED;
+        }
     }
 
     performRemoveMove(relativePosition: IPosition): void {
         const foundPiece = this.findIntersectingPieceForRemove(relativePosition);
         if (foundPiece && foundPiece.x != null && foundPiece.y != null) {
-            this.circles = this.circles.filter(circle => circle.x != foundPiece.x || circle.y != foundPiece.y);
-            this.circles.push(new BoardCircle(foundPiece.x, foundPiece.y, this.baseRadiusSize));
+            foundPiece.changeColor(Color.BLACK);
             if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
                 this.moveType = MoveType.REMOVE_OPPONENT;
                 this.drawBoard();
@@ -173,32 +176,19 @@ export class AppComponent implements AfterViewInit {
         this.availableReds = this.redDrawerService.getNumberOfAvailablePieces();
         this.availableGreens = this.greenDrawerService.getNumberOfAvailablePieces();
 
-        this.usedReds = this.circles.filter(piece => piece instanceof RedPiece).length;
-        this.usedGreens = this.circles.filter(piece => piece instanceof GreenPiece).length;
+        this.usedReds = this.circles.filter(piece => piece.color === Color.RED).length;
+        this.usedGreens = this.circles.filter(piece => piece.color === Color.GREEN).length;
 
         this.redDrawerService.drawDrawer();
         this.greenDrawerService.drawDrawer();
     }
 
-    getNewPieceForColor(color: Color) {
-        switch (color) {
-            case Color.RED:
-                return new RedPiece(null, null, 2 * this.baseRadiusSize);
-            case Color.GREEN:
-                return new GreenPiece(null, null, 2 * this.baseRadiusSize);
-        }
-    }
-
     setAvailablePiece(drawerService: DrawerService, circle: ICircle): void {
         if (drawerService.getNumberOfAvailablePieces() > 0) {
-            this.circles = this.circles.filter(c => c.x != circle.x || c.y != circle.y);
-            const foundPiece = this.getNewPieceForColor(this.turn);
-            foundPiece.x = circle.x;
-            foundPiece.y = circle.y;
-            this.circles.push(foundPiece);
+            circle.changeColor(this.turn);
             drawerService.decreaseNumberOfAvailablePieces();
-            const pieces = this.circles.filter(c => c.color === foundPiece.color);
-            const mill = this.checkForMill(pieces, foundPiece);
+            const pieces = this.circles.filter(c => c.color === this.turn);
+            const mill = this.checkForMill(pieces, circle);
             switch (mill) {
                 case 1:
                     this.moveType = MoveType.REMOVE_OPPONENT;
