@@ -6,7 +6,7 @@ export class CanvasService {
 
     ctx: CanvasRenderingContext2D;
 
-    constructor(private canvas: HTMLCanvasElement, private baseSize: number, private offset: number) {
+    constructor(private canvas: HTMLCanvasElement, private baseSize: number, private offset: number, private baseRadiuseSie: number) {
         this.ctx = canvas.getContext('2d');
     }
 
@@ -38,7 +38,7 @@ export class CanvasService {
         this.ctx.beginPath();
         const finalX = this.getRealCoordinate(x);
         const finalY = this.getRealCoordinate(y);
-        this.ctx.arc(finalX, finalY, radius, 0, 2 * Math.PI);
+        this.ctx.arc(finalX, finalY, radius * this.baseRadiuseSie, 0, 2 * Math.PI);
         if (color != Color.NONE) {
             this.ctx.fillStyle = getColorRgbaString(color);
             this.ctx.fill();
@@ -85,6 +85,6 @@ export class CanvasService {
         }
 
         return Math.sqrt((point.x - this.getRealCoordinate(circle.x)) ** 2
-            + (point.y - this.getRealCoordinate(circle.y)) ** 2) < circle.radius * 2;
+            + (point.y - this.getRealCoordinate(circle.y)) ** 2) < circle.radius * 2 * this.baseRadiuseSie;
     }
 }

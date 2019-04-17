@@ -9,6 +9,7 @@ import {getWinSize, isBigScreen} from "./service/window-size.service";
 import {GameState, IGameState} from "./model/game-state.model";
 import {MoveResult} from "./model/move-result.enum";
 import {PlayerType} from "./model/player-type.enum";
+import {GameService} from "./service/game.service";
 
 @Component({
     selector: 'app-root',
@@ -28,6 +29,9 @@ export class GameComponent implements AfterViewInit, OnInit {
     greenDrawerService: DrawerService;
 
     gameState: IGameState = null;
+
+    constructor(private gameService: GameService) {
+    }
 
     ngOnInit(): void {
         this.gameState = new GameState(PlayerType.HUMAN, PlayerType.HUMAN);
@@ -50,22 +54,21 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.baseSize = this.canvas.width / 8;
         this.offset = this.baseSize;
         const baseRadiusSize = this.baseSize / 6;
-        this.gameState.setBaseRadiusSize(baseRadiusSize);
 
-        this.canvasService = new CanvasService(this.canvas, this.baseSize, this.offset);
+        this.canvasService = new CanvasService(this.canvas, this.baseSize, this.offset, baseRadiusSize);
 
         this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement,
             this.baseSize,
             this.offset,
             this.gameState.redPlayerState.piecesInDrawer,
             Color.RED,
-            2 * baseRadiusSize);
+            2, baseRadiusSize);
         this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement,
             this.baseSize,
             this.offset,
             this.gameState.greenPlayerState.piecesInDrawer,
             Color.GREEN,
-            2 * baseRadiusSize);
+            2, baseRadiusSize);
 
         this.drawBoard(this.gameState);
         this.addCanvasOnClickListener();
@@ -86,7 +89,7 @@ export class GameComponent implements AfterViewInit, OnInit {
         const relativePosition = this.canvasService.getPositionInCanvas(event);
         const selectedCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
         if (selectedCircle) {
-            this.processMoveResult(this.gameState, this.gameState.performMove(selectedCircle));
+            this.processMoveResult(this.gameState, this.gameService.performMove(this.gameState,selectedCircle));
         }
     }
 
@@ -101,13 +104,13 @@ export class GameComponent implements AfterViewInit, OnInit {
                     case MoveType.NORMAL:
                     case MoveType.REMOVE_OPPONENT:
                     case MoveType.REMOVE_OPPONENT_2:
-                        isMoveAllowed = this.gameState.isMoveAllowed(hoveredCircle);
+                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState,hoveredCircle);
                         break;
                     case MoveType.MOVE_NEARBY:
                     case MoveType.MOVE_ANYWHERE:
-                        isMoveAllowed = this.gameState.isMoveAllowed(hoveredCircle);
+                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState,hoveredCircle);
                         if (!isMoveAllowed && this.gameState.chosenForShift != null) {
-                            isMoveAllowed = this.gameState.isShiftToAllowed(this.gameState.chosenForShift, hoveredCircle);
+                            isMoveAllowed = this.gameService.isShiftToAllowed(this.gameState,this.gameState.chosenForShift, hoveredCircle);
                         }
                         break;
                 }

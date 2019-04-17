@@ -5,8 +5,6 @@ export interface ICircle {
     y: number;
     radius: number;
     color: Color;
-
-    changeColor(color: Color): void;
 }
 
 export class Circle implements ICircle {
@@ -18,19 +16,6 @@ export class Circle implements ICircle {
         public radius: number
     ) {
     }
-
-    changeColor(color: Color): void {
-        let radiusFactor = 1;
-        if (this.color == Color.BLACK && color != Color.BLACK) {
-            radiusFactor = 2;
-        }
-        if (color == Color.BLACK && this.color != Color.BLACK) {
-            radiusFactor = 0.5;
-        }
-        this.radius *= radiusFactor;
-        this.color = color;
-    }
-
 }
 
 export class HighlightedCircle implements ICircle {
@@ -47,7 +32,16 @@ export class HighlightedCircle implements ICircle {
         this.radius = circle.radius * 2;
     }
 
-    changeColor(color: Color): void {
-    }
+}
 
+export function changeColor(circle: Circle, color: Color): void {
+    let radiusFactor = 1;
+    if (circle.color == Color.BLACK && color != Color.BLACK) {
+        radiusFactor = 2;
+    }
+    if (color == Color.BLACK && circle.color != Color.BLACK) {
+        radiusFactor = 0.5;
+    }
+    circle.radius *= radiusFactor;
+    circle.color = color;
 }

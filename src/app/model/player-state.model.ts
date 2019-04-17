@@ -9,8 +9,6 @@ export interface IPlayerState {
     color: Color;
     lastPosition: ICircle;
     playerType: PlayerType;
-
-    decreaseNumberOfAvailablePieces(): void;
 }
 
 export class PlayerState implements IPlayerState {
@@ -25,10 +23,5 @@ export class PlayerState implements IPlayerState {
         this.points = 0;
         this.piecesOnBoard = 0;
     }
-
-    decreaseNumberOfAvailablePieces(): void {
-        this.piecesInDrawer--;
-    }
-
 }
 
