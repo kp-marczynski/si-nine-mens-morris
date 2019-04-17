@@ -50,5 +50,4 @@ export class HighlightedCircle implements ICircle {
     changeColor(color: Color): void {
     }
 
-
 }
