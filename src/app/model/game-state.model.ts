@@ -13,12 +13,9 @@ export interface IGameState {
     baseRadiusSize: number;
     redPlayerState: IPlayerState;
     greenPlayerState: IPlayerState;
+    chosenForShift: ICircle;
 
-    isNormalMoveAllowed(selectedCircle: ICircle): boolean;
-
-    isOpponentRemoveAllowed(selectedCircle: ICircle): boolean;
-
-    isShiftFromAllowed(selectedCircle: ICircle): boolean;
+    isMoveAllowed(selectedCircle: ICircle): boolean;
 
     isShiftToAllowed(selectedCircle: ICircle, destinationCircle: ICircle): boolean;
 
@@ -31,8 +28,9 @@ export interface IGameState {
 
 export class GameState implements IGameState {
     private boardCenter = 3;
-    private chosenForShift: ICircle;
     private boardSize = 7;
+    
+    chosenForShift: ICircle;
     baseRadiusSize: number;
 
     turn: Color = Color.RED;
@@ -86,8 +84,8 @@ export class GameState implements IGameState {
         }
     }
 
-    isNormalMoveAllowed(selectedCircle: ICircle): boolean {
-        return this.findDestinationsForNormalMove().find(circle => circle.x == selectedCircle.x && circle.y == selectedCircle.y) != null;
+    isMoveAllowed(selectedCircle: ICircle): boolean {
+        return this.allowedMoves.find(circle => this.compareCirclesPosition(circle, selectedCircle)) != null;
     }
 
     private findDestinationsForNormalMove(): ICircle[] {
@@ -99,10 +97,6 @@ export class GameState implements IGameState {
         return pieces;
     }
 
-    isOpponentRemoveAllowed(selectedCircle: ICircle): boolean {
-        return this.findDestinationsForOpponentRemove().find(circle => this.compareCirclesPosition(circle, selectedCircle)) != null;
-    }
-
     private findDestinationsForOpponentRemove(): ICircle[] {
         return this.circles.filter(piece => piece.color === getOpponentColor(this.turn));
     }
@@ -111,9 +105,6 @@ export class GameState implements IGameState {
         return this.circles.filter(piece => piece.color === this.turn);
     }
 
-    isShiftFromAllowed(selectedCircle: ICircle): boolean {
-        return this.findShiftSources().find(circle => this.compareCirclesPosition(circle, selectedCircle)) != null;
-    }
 
     isShiftToAllowed(selectedCircle: ICircle, destinationCircle: ICircle): boolean {
         if (selectedCircle.color != this.turn) {
@@ -250,14 +241,14 @@ export class GameState implements IGameState {
     }
 
     private performNormalMove(selectedCircle: ICircle): MoveResult {
-        if (this.isNormalMoveAllowed(selectedCircle)) {
+        if (this.isMoveAllowed(selectedCircle)) {
             return this.putPieceOnBoard(selectedCircle, false);
         }
         return MoveResult.MOVE_NOT_ALLOWED;
     }
 
     private performRemoveMove(selectedCircle: ICircle): MoveResult {
-        const removeAllowed = this.isOpponentRemoveAllowed(selectedCircle);
+        const removeAllowed = this.isMoveAllowed(selectedCircle);
         if (removeAllowed && selectedCircle.x != null && selectedCircle.y != null) {
             this.setLastMove(selectedCircle);
             selectedCircle.changeColor(Color.BLACK);
@@ -272,7 +263,7 @@ export class GameState implements IGameState {
     }
 
     private performShift(selectedCircle: ICircle): MoveResult {
-        if (this.isShiftFromAllowed(selectedCircle)) {
+        if (this.isMoveAllowed(selectedCircle)) {
             this.chosenForShift = selectedCircle;
             switch (this.moveType) {
                 case MoveType.MOVE_NEARBY:
@@ -285,7 +276,7 @@ export class GameState implements IGameState {
                     return MoveResult.MOVE_NOT_ALLOWED;
             }
             return MoveResult.SELECTED_TO_SHIFT;
-        } else if (this.isShiftToAllowed(this.chosenForShift, selectedCircle)) {
+        } else if (this.chosenForShift && this.isShiftToAllowed(this.chosenForShift, selectedCircle)) {
             this.shiftDestinations = [];
             const chosen = this.chosenForShift;
             this.chosenForShift = null;
@@ -294,6 +285,7 @@ export class GameState implements IGameState {
             chosen.changeColor(Color.BLACK);
             return this.putPieceOnBoard(this.circles.find(circle => circle.x == selectedCircle.x && circle.y == selectedCircle.y), true);
         }
+        return MoveResult.MOVE_NOT_ALLOWED;
     }
 
     performMove(selectedCircle: ICircle): MoveResult {

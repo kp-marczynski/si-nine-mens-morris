@@ -1,9 +1,9 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {Circle, HighlightedCircle, ICircle} from './model/circle.model';
+import {HighlightedCircle, ICircle} from './model/circle.model';
 import {MoveType} from './model/move-type.enum';
 import {CanvasService} from './service/canvas.service';
 import {IPosition} from './model/position.model';
-import {Color, getOpponentColor} from "./model/color.enum";
+import {Color} from "./model/color.enum";
 import {DrawerService} from "./service/drawer.service";
 import {getWinSize, isBigScreen} from "./service/window-size.service";
 import {GameState, IGameState} from "./model/game-state.model";
@@ -98,15 +98,16 @@ export class GameComponent implements AfterViewInit, OnInit {
             if (hoveredCircle) {
                 switch (this.gameState.moveType) {
                     case MoveType.NORMAL:
-                        isMoveAllowed = this.gameState.isNormalMoveAllowed(hoveredCircle) != null;
-                        break;
                     case MoveType.REMOVE_OPPONENT:
                     case MoveType.REMOVE_OPPONENT_2:
-                        isMoveAllowed = this.gameState.isOpponentRemoveAllowed(hoveredCircle) != null;
+                        isMoveAllowed = this.gameState.isMoveAllowed(hoveredCircle);
                         break;
                     case MoveType.MOVE_NEARBY:
                     case MoveType.MOVE_ANYWHERE:
-                        isMoveAllowed = this.gameState.isShiftFromAllowed(hoveredCircle) != null;
+                        isMoveAllowed = this.gameState.isMoveAllowed(hoveredCircle);
+                        if (!isMoveAllowed && this.gameState.chosenForShift != null) {
+                            isMoveAllowed = this.gameState.isShiftToAllowed(this.gameState.chosenForShift, hoveredCircle);
+                        }
                         break;
                 }
             }
@@ -120,15 +121,9 @@ export class GameComponent implements AfterViewInit, OnInit {
 
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
-        this.getDrawerServiceForCurrentPlayer(gameState).numberOfPieces = gameState.getCurrentPlayer().availablePieces;
-        switch (moveResult) {
-            case MoveResult.FINISHED_TURN:
-            case MoveResult.CHANGED_STATE_TO_REMOVE:
-            case MoveResult.MOVE_NOT_ALLOWED:
-            case MoveResult.SELECTED_TO_SHIFT:
-                this.drawBoard(gameState);
-                break;
-        }
+        this.redDrawerService.numberOfPieces = gameState.redPlayerState.availablePieces;
+        this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.availablePieces;
+        this.drawBoard(gameState);
     }
 
     drawBoard(gameState: IGameState): void {
@@ -146,16 +141,6 @@ export class GameComponent implements AfterViewInit, OnInit {
 
         this.redDrawerService.drawDrawer();
         this.greenDrawerService.drawDrawer();
-    }
-
-
-    getDrawerServiceForCurrentPlayer(gameState: IGameState): DrawerService {
-        switch (gameState.turn) {
-            case Color.RED:
-                return this.redDrawerService;
-            case Color.GREEN:
-                return this.greenDrawerService;
-        }
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {
