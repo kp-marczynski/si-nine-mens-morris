@@ -1,26 +1,31 @@
 import {ICircle} from "./circle.model";
+import {Color} from "./color.enum";
 
 export interface IPlayerState {
-    availablePieces: number;
-    usedPieces: number;
-
+    piecesInDrawer: number;
+    piecesOnBoard: number;
+    points: number;
+    color: Color;
     lastPosition: ICircle;
 
     decreaseNumberOfAvailablePieces(): void;
 }
 
 export class PlayerState implements IPlayerState {
-    availablePieces: number;
-    usedPieces: number;
+    piecesInDrawer: number;
+    piecesOnBoard: number;
+    points: number;
 
     lastPosition: ICircle;
 
-    constructor() {
-        this.availablePieces = 9;
+    constructor(public color: Color) {
+        this.piecesInDrawer = 9;
+        this.points = 0;
+        this.piecesOnBoard = 0;
     }
 
     decreaseNumberOfAvailablePieces(): void {
-        this.availablePieces--;
+        this.piecesInDrawer--;
     }
 
 }

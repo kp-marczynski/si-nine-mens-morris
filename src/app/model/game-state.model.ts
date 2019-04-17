@@ -42,13 +42,13 @@ export class GameState implements IGameState {
     allowedMoves: ICircle[];
 
     constructor() {
-        this.redPlayerState = new PlayerState();
-        this.greenPlayerState = new PlayerState();
+        this.redPlayerState = new PlayerState(Color.RED);
+        this.greenPlayerState = new PlayerState(Color.GREEN);
 
         this.allowedMoves = this.circles;
 
-        this.redPlayerState.usedPieces = 0;
-        this.greenPlayerState.usedPieces = 0;
+        this.redPlayerState.piecesOnBoard = 0;
+        this.greenPlayerState.piecesOnBoard = 0;
     }
 
     setBaseRadiusSize(size: number) {
@@ -131,7 +131,7 @@ export class GameState implements IGameState {
 
             let operationPossible: boolean = isShifting;
 
-            if (currentPlayer.availablePieces > 0) {
+            if (currentPlayer.piecesInDrawer > 0) {
                 currentPlayer.decreaseNumberOfAvailablePieces();
                 operationPossible = true;
             }
@@ -140,6 +140,7 @@ export class GameState implements IGameState {
                 circle.changeColor(this.turn);
                 if (!isShifting) {
                     this.setLastMove(circle);
+                    this.getCurrentPlayer().piecesOnBoard++;
                 }
 
                 const pieces = this.circles.filter(c => c.color === this.turn);
@@ -193,6 +194,15 @@ export class GameState implements IGameState {
                 return this.redPlayerState;
             case Color.GREEN:
                 return this.greenPlayerState;
+        }
+    }
+
+    getOpponentPlayer(): IPlayerState {
+        switch (this.turn) {
+            case Color.RED:
+                return this.greenPlayerState;
+            case Color.GREEN:
+                return this.redPlayerState;
         }
     }
 
@@ -255,6 +265,8 @@ export class GameState implements IGameState {
         if (removeAllowed && selectedCircle.x != null && selectedCircle.y != null) {
             this.setLastMove(selectedCircle);
             selectedCircle.changeColor(Color.BLACK);
+            this.getCurrentPlayer().points++;
+            this.getOpponentPlayer().piecesOnBoard--;
             if (this.moveType === MoveType.REMOVE_OPPONENT_2) {
                 this.moveType = MoveType.REMOVE_OPPONENT;
                 return MoveResult.CHANGED_STATE_TO_REMOVE;
@@ -312,7 +324,6 @@ export class GameState implements IGameState {
                 moveResult = MoveResult.MOVE_NOT_ALLOWED;
                 break;
         }
-        this.updateStats();
 
         if (moveResult == MoveResult.FINISHED_TURN) {
             return this.initNewTurn();
@@ -322,8 +333,8 @@ export class GameState implements IGameState {
     private initNewTurn(): MoveResult {
         this.turn = getOpponentColor(this.turn);
 
-        const availablePieces = this.getCurrentPlayer().availablePieces;
-        const usedPieces = this.getCurrentPlayer().usedPieces;
+        const availablePieces = this.getCurrentPlayer().piecesInDrawer;
+        const usedPieces = this.getCurrentPlayer().piecesOnBoard;
 
         const allPieces = usedPieces + availablePieces;
 
@@ -368,11 +379,6 @@ export class GameState implements IGameState {
             }
         }
         return false;
-    }
-
-    private updateStats() {
-        this.redPlayerState.usedPieces = this.circles.filter(piece => piece.color === Color.RED).length;
-        this.greenPlayerState.usedPieces = this.circles.filter(piece => piece.color === Color.GREEN).length;
     }
 }
 

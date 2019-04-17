@@ -27,3 +27,16 @@ h1 {
     position: center;
     text-align: center;
 }
+
+td {
+    min-width: 75px;
+    text-align: center;
+}
+
+th {
+    text-align: left;
+}
+
+.header-row > th {
+    text-align: center;
+}

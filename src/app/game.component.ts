@@ -56,13 +56,13 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement,
             this.baseSize,
             this.offset,
-            this.gameState.redPlayerState.availablePieces,
+            this.gameState.redPlayerState.piecesInDrawer,
             Color.RED,
             2 * baseRadiusSize);
         this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement,
             this.baseSize,
             this.offset,
-            this.gameState.greenPlayerState.availablePieces,
+            this.gameState.greenPlayerState.piecesInDrawer,
             Color.GREEN,
             2 * baseRadiusSize);
 
@@ -121,8 +121,8 @@ export class GameComponent implements AfterViewInit, OnInit {
 
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
-        this.redDrawerService.numberOfPieces = gameState.redPlayerState.availablePieces;
-        this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.availablePieces;
+        this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;
+        this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.piecesInDrawer;
         this.drawBoard(gameState);
     }
 

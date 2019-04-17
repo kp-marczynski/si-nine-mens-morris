@@ -18,38 +18,27 @@
         </mat-grid-list>
     </div>
     <mat-card class="score-board">
+        <!--<mat-card-title>Stats:</mat-card-title>-->
         <table>
-            <tr>
-                <td>Turn:</td>
-                <td>{{gameState.turn}}</td>
+            <tr class="header-row">
+                <th></th>
+                <th>{{gameState.redPlayerState.color}}</th>
+                <th>{{gameState.greenPlayerState.color}}</th>
             </tr>
             <tr>
-                <td>Move type:</td>
-                <td>{{gameState.moveType}}</td>
-            </tr>
-            <!--<tr>-->
-            <!--<td>Total reds:</td>-->
-            <!--<td>{{redPieces.length}}</td>-->
-            <!--</tr>-->
-            <tr>
-                <td>Available reds:</td>
-                <td>{{gameState.redPlayerState.availablePieces}}</td>
+                <th>Points:</th>
+                <td>{{gameState.redPlayerState.points}}</td>
+                <td>{{gameState.greenPlayerState.points}}</td>
             </tr>
             <tr>
-                <td>Used reds:</td>
-                <td>{{gameState.redPlayerState.usedPieces}}</td>
-            </tr>
-            <!--<tr>-->
-            <!--<td>Total greens:</td>-->
-            <!--<td>{{greenPieces.length}}</td>-->
-            <!--</tr>-->
-            <tr>
-                <td>Available greens:</td>
-                <td>{{gameState.greenPlayerState.availablePieces}}</td>
+                <th>Pieces in drawer:</th>
+                <td>{{gameState.redPlayerState.piecesInDrawer}}</td>
+                <td>{{gameState.greenPlayerState.piecesInDrawer}}</td>
             </tr>
             <tr>
-                <td>Used greens:</td>
-                <td>{{gameState.greenPlayerState.usedPieces}}</td>
+                <th>Pieces on board:</th>
+                <td>{{gameState.redPlayerState.piecesOnBoard}}</td>
+                <td>{{gameState.greenPlayerState.piecesOnBoard}}</td>
             </tr>
         </table>
     </mat-card>
@@ -60,10 +49,16 @@
                 <li>Each player has 9 pieces when the game begins.</li>
                 <li>Unused pieces are placed in the players drawers.</li>
                 <li>When player has pieces in the drawer then he can only place new pieces on empty fields.</li>
-                <li>When player has no pieces left in the drawer then he can move one of his pieces to neighbouring empty field.</li>
-                <li>When player has no pieces left in the drawer and has 3 pieces on board then he can move one of his pieces to any empty field.</li>
+                <li>When player has no pieces left in the drawer then he can move one of his pieces to neighbouring
+                    empty field.
+                </li>
+                <li>When player has no pieces left in the drawer and has 3 pieces on board then he can move one of his
+                    pieces to any empty field.
+                </li>
                 <li>After selecting piece for moving available places to move are highlighted.</li>
-                <li>If placed or moved piece created <em>mill</em> (3 of player pieces connected in straight line) then player can remove one of opponent pieces from board.</li>
+                <li>If placed or moved piece created <em>mill</em> (3 of player pieces connected in straight line) then
+                    player can remove one of opponent pieces from board.
+                </li>
                 <li>Last used player position is not available in the next move.</li>
                 <li>Game ends when player has less than 3 pieces left or when he can't make any move.</li>
             </ol>
