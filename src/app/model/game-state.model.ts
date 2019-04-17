@@ -29,7 +29,7 @@ export interface IGameState {
 export class GameState implements IGameState {
     private boardCenter = 3;
     private boardSize = 7;
-    
+
     chosenForShift: ICircle;
     baseRadiusSize: number;
 
