@@ -4,6 +4,8 @@ import {Circle, ICircle} from "./circle.model";
 import {IPlayerState, PlayerState} from "./player-state.model";
 import {IPosition} from "./position.model";
 import {MoveResult} from "./move-result.enum";
+import * as lodash from 'lodash';
+import {PlayerType} from "./player-type.enum";
 
 export interface IGameState {
     turn: Color;
@@ -15,6 +17,8 @@ export interface IGameState {
     greenPlayerState: IPlayerState;
     chosenForShift: ICircle;
 
+    clone(): IGameState;
+
     isMoveAllowed(selectedCircle: ICircle): boolean;
 
     isShiftToAllowed(selectedCircle: ICircle, destinationCircle: ICircle): boolean;
@@ -24,11 +28,15 @@ export interface IGameState {
     performMove(selectedCircle: ICircle): MoveResult;
 
     setBaseRadiusSize(size: number);
+
+    getAllPossibleNextMoveResults(): IGameState[];
 }
 
+const boardCenter = 3;
+const boardSize = 7;
+
 export class GameState implements IGameState {
-    private boardCenter = 3;
-    private boardSize = 7;
+
 
     chosenForShift: ICircle;
     baseRadiusSize: number;
@@ -41,14 +49,18 @@ export class GameState implements IGameState {
     greenPlayerState: IPlayerState;
     allowedMoves: ICircle[];
 
-    constructor() {
-        this.redPlayerState = new PlayerState(Color.RED);
-        this.greenPlayerState = new PlayerState(Color.GREEN);
+    constructor(redPlayerType: PlayerType, greenPlayerType: PlayerType) {
+        this.redPlayerState = new PlayerState(Color.RED, redPlayerType);
+        this.greenPlayerState = new PlayerState(Color.GREEN, greenPlayerType);
 
         this.allowedMoves = this.circles;
 
         this.redPlayerState.piecesOnBoard = 0;
         this.greenPlayerState.piecesOnBoard = 0;
+    }
+
+    clone(): GameState {
+        return lodash.cloneDeep(this);
     }
 
     setBaseRadiusSize(size: number) {
@@ -57,10 +69,10 @@ export class GameState implements IGameState {
     }
 
     private initCircles() {
-        for (let x = 0; x < this.boardSize; ++x) {
-            for (let y = 0; y < this.boardSize; ++y) {
-                if ((Math.abs(x - this.boardCenter) === Math.abs(y - this.boardCenter) || x === this.boardCenter || y === this.boardCenter)
-                    && !(x === this.boardCenter && y === this.boardCenter)) {
+        for (let x = 0; x < boardSize; ++x) {
+            for (let y = 0; y < boardSize; ++y) {
+                if ((Math.abs(x - boardCenter) === Math.abs(y - boardCenter) || x === boardCenter || y === boardCenter)
+                    && !(x === boardCenter && y === boardCenter)) {
                     this.circles.push(new Circle(x, y, this.baseRadiusSize));
                 }
             }
@@ -88,7 +100,7 @@ export class GameState implements IGameState {
     }
 
     isMoveAllowed(selectedCircle: ICircle): boolean {
-        return this.allowedMoves.find(circle => this.compareCirclesPosition(circle, selectedCircle)) != null;
+        return this.allowedMoves.find(circle => GameState.compareCirclesPosition(circle, selectedCircle)) != null;
     }
 
     private findDestinationsForNormalMove(): ICircle[] {
@@ -115,9 +127,9 @@ export class GameState implements IGameState {
         }
         switch (this.moveType) {
             case MoveType.MOVE_NEARBY:
-                return this.findDestinationsForNearbyMove(selectedCircle).find(circle => this.compareCirclesPosition(circle, destinationCircle)) != null;
+                return this.findDestinationsForNearbyMove(selectedCircle).find(circle => GameState.compareCirclesPosition(circle, destinationCircle)) != null;
             case MoveType.MOVE_ANYWHERE:
-                return this.circles.find(circle => circle.color === Color.BLACK && this.compareCirclesPosition(circle, destinationCircle)) != null;
+                return this.circles.find(circle => circle.color === Color.BLACK && GameState.compareCirclesPosition(circle, destinationCircle)) != null;
             default:
                 return false;
         }
@@ -211,21 +223,21 @@ export class GameState implements IGameState {
         const result: ICircle[] = [];
 
         for (const circle of foundCircles) {
-            if (Math.abs(this.boardCenter - chosenCircle.x) == Math.abs(this.boardCenter - chosenCircle.y)) {
-                if ((circle.x == chosenCircle.x && circle.y == this.boardCenter) || (circle.x == this.boardCenter && circle.y == chosenCircle.y)) {
+            if (Math.abs(boardCenter - chosenCircle.x) == Math.abs(boardCenter - chosenCircle.y)) {
+                if ((circle.x == chosenCircle.x && circle.y == boardCenter) || (circle.x == boardCenter && circle.y == chosenCircle.y)) {
                     result.push(circle);
                 }
-            } else if (chosenCircle.x == this.boardCenter) {
+            } else if (chosenCircle.x == boardCenter) {
                 if ((circle.y == chosenCircle.y
-                    && (circle.x == chosenCircle.x + Math.abs(this.boardCenter - chosenCircle.y) || circle.x == chosenCircle.x - Math.abs(this.boardCenter - chosenCircle.y))
-                ) || (circle.x == this.boardCenter && (circle.y == chosenCircle.y + 1 || circle.y == chosenCircle.y - 1))) {
+                    && (circle.x == chosenCircle.x + Math.abs(boardCenter - chosenCircle.y) || circle.x == chosenCircle.x - Math.abs(boardCenter - chosenCircle.y))
+                ) || (circle.x == boardCenter && (circle.y == chosenCircle.y + 1 || circle.y == chosenCircle.y - 1))) {
                     result.push(circle);
                 }
 
-            } else if (chosenCircle.y == this.boardCenter) {
+            } else if (chosenCircle.y == boardCenter) {
                 if ((circle.x == chosenCircle.x
-                    && (circle.y == chosenCircle.y + Math.abs(this.boardCenter - chosenCircle.x) || circle.y == chosenCircle.y - Math.abs(this.boardCenter - chosenCircle.x))
-                ) || (circle.y == this.boardCenter && (circle.x == chosenCircle.x + 1 || circle.x == chosenCircle.x - 1))) {
+                    && (circle.y == chosenCircle.y + Math.abs(boardCenter - chosenCircle.x) || circle.y == chosenCircle.y - Math.abs(boardCenter - chosenCircle.x))
+                ) || (circle.y == boardCenter && (circle.x == chosenCircle.x + 1 || circle.x == chosenCircle.x - 1))) {
                     result.push(circle);
                 }
             }
@@ -249,7 +261,7 @@ export class GameState implements IGameState {
         }
     }
 
-    private compareCirclesPosition(circle1: ICircle, circle2: ICircle): boolean {
+    private static compareCirclesPosition(circle1: ICircle, circle2: ICircle): boolean {
         return circle1.x == circle2.x && circle1.y == circle2.y;
     }
 
@@ -380,5 +392,34 @@ export class GameState implements IGameState {
         }
         return false;
     }
+
+    public getAllPossibleNextMoveResults(): IGameState[] {
+        return this.getAllPossibleNextMoveResultsForDestinations(this.allowedMoves);
+    }
+
+    private getAllPossibleNextMoveResultsForDestinations(destinations: ICircle[]): IGameState[] {
+        const result: IGameState[] = [];
+        for (let possibleMove of destinations) {
+            const gameState = this.clone();
+            switch (gameState.performMove(possibleMove)) {
+                case MoveResult.CHANGED_STATE_TO_REMOVE:
+                    result.concat(gameState.getAllPossibleNextMoveResultsForDestinations(gameState.allowedMoves));
+                    break;
+                case MoveResult.SELECTED_TO_SHIFT:
+                    result.concat(gameState.getAllPossibleNextMoveResultsForDestinations(gameState.shiftDestinations));
+                    break;
+                case MoveResult.FINISHED_TURN:
+                case MoveResult.END_GAME:
+                    result.push(gameState);
+                    break;
+                case MoveResult.MOVE_NOT_ALLOWED:
+                default:
+                    break;
+            }
+
+        }
+        return result;
+    }
+
 }
 

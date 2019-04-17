@@ -8,6 +8,7 @@ import {DrawerService} from "./service/drawer.service";
 import {getWinSize, isBigScreen} from "./service/window-size.service";
 import {GameState, IGameState} from "./model/game-state.model";
 import {MoveResult} from "./model/move-result.enum";
+import {PlayerType} from "./model/player-type.enum";
 
 @Component({
     selector: 'app-root',
@@ -29,7 +30,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     gameState: IGameState = null;
 
     ngOnInit(): void {
-        this.gameState = new GameState();
+        this.gameState = new GameState(PlayerType.HUMAN, PlayerType.HUMAN);
     }
 
     ngAfterViewInit(): void {
