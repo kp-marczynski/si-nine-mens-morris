@@ -4,7 +4,6 @@ import {Circle, ICircle} from "./circle.model";
 import {IPlayerState, PlayerState} from "./player-state.model";
 import {IPosition} from "./position.model";
 import {MoveResult} from "./move-result.enum";
-import * as lodash from 'lodash';
 import {PlayerType} from "./player-type.enum";
 
 export interface IGameState {
@@ -60,7 +59,7 @@ export class GameState implements IGameState {
     }
 
     clone(): GameState {
-        return lodash.cloneDeep(this);
+        return JSON.parse(JSON.stringify(this));
     }
 
     setBaseRadiusSize(size: number) {
