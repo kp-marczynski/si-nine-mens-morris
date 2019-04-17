@@ -6,17 +6,17 @@ This project is realization of task for Uni 'Artificial Intelligence' course.
 Run `npm install` and then `ng serve` for a dev server. 
 Navigate to `http://localhost:4200/`. 
 
-##Demo
+## Demo
 Game is available online under [https://kp-marczynski.github.io/si-nine-mens-morris/](https://kp-marczynski.github.io/si-nine-mens-morris/) . 
 
-###Normal move:
+### Normal move:
 ![](demo/normal_move.gif)
 
-###Mill:
+### Mill:
 ![](demo/mill.gif)
 
-###Move nearby:
+### Move nearby:
 ![](demo/move_nearby.gif)
 
-###Move anywhere:
+### Move anywhere:
 ![](demo/move_anywhere.gif)
