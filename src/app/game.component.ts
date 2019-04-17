@@ -7,7 +7,7 @@ import {Color, getOpponentColor} from "./model/color.enum";
 import {DrawerService} from "./service/drawer.service";
 import {getWinSize, isBigScreen} from "./service/window-size.service";
 import {GameState, IGameState} from "./model/game-state.model";
-import {PutPieceResult} from "./model/put-piece-result.enum";
+import {MoveResult} from "./model/move-result.enum";
 
 @Component({
     selector: 'app-root',
@@ -27,9 +27,6 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     redDrawerService: DrawerService;
     greenDrawerService: DrawerService;
-
-    highlightedCircles: ICircle[] = [];
-    chosenForShift: ICircle = null;
 
     gameState: IGameState = null;
 
@@ -102,17 +99,15 @@ export class GameComponent implements AfterViewInit, OnInit {
         if (selectedCircle) {
             switch (this.gameState.moveType) {
                 case MoveType.NORMAL:
-                    this.performNormalMove(this.gameState, selectedCircle);
+                    this.processMoveResult(this.gameState, this.gameState.performNormalMove(selectedCircle));
                     break;
                 case MoveType.REMOVE_OPPONENT:
                 case MoveType.REMOVE_OPPONENT_2:
-                    this.performRemoveMove(this.gameState, selectedCircle);
+                    this.processMoveResult(this.gameState, this.gameState.performRemoveMove(selectedCircle));
                     break;
                 case MoveType.MOVE_NEARBY:
-                    this.performNearbyMove(this.gameState, selectedCircle);
-                    break;
                 case MoveType.MOVE_ANYWHERE:
-                    this.performAnywhereMove(this.gameState, selectedCircle);
+                    this.processMoveResult(this.gameState, this.gameState.performShift(selectedCircle));
                     break;
             }
         }
@@ -135,7 +130,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                         break;
                     case MoveType.MOVE_NEARBY:
                     case MoveType.MOVE_ANYWHERE:
-                        circleFound = this.gameState.isShiftAllowed(hoveredCircle) != null;
+                        circleFound = this.gameState.isShiftFromAllowed(hoveredCircle) != null;
                         break;
                 }
             }
@@ -148,115 +143,18 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
 
-    performNormalMove(gameState: IGameState, selectedCircle: ICircle): void {
-        if (gameState.isNormalMoveAllowed(selectedCircle)) {
-            this.putPieceOnBoard(gameState, selectedCircle, false);
-        }
-    }
-
-    performRemoveMove(gameState: IGameState, selectedCircle: ICircle): void {
-        const removeAllowed = gameState.isOpponentRemoveAllowed(selectedCircle);
-        if (removeAllowed && selectedCircle.x != null && selectedCircle.y != null) {
-            selectedCircle.changeColor(Color.BLACK);
-            gameState.setLastMove(selectedCircle);
-            if (gameState.moveType === MoveType.REMOVE_OPPONENT_2) {
-                gameState.moveType = MoveType.REMOVE_OPPONENT;
-                this.drawBoard(gameState);
-            } else {
-                this.changeTurn(gameState);
-            }
-        }
-    }
-
-    performNearbyMove(gameState: IGameState, selectedCircle: ICircle): void {
-        const circleForShift = gameState.isShiftAllowed(selectedCircle);
-
-        if (circleForShift) {
-            this.chosenForShift = selectedCircle;
-            this.highlightedCircles = this.findCirclesForNearbyMove(gameState, selectedCircle);
-            this.drawBoard(gameState);
-        } else {
-            this.performShift(gameState, this.chosenForShift, selectedCircle);
-        }
-    }
-
-    performShift(gameState: IGameState, chosenForShift: ICircle, destination: ICircle) {
-        const foundCircle = this.findHighlightedCircle(destination);
-        if (foundCircle) {
-            chosenForShift.changeColor(Color.BLACK);
-            this.chosenForShift = null;
-            this.putPieceOnBoard(gameState, gameState.circles.find(circle => circle.x == foundCircle.x && circle.y == foundCircle.y), true);
-        }
-    }
-
-    putPieceOnBoard(gameState: IGameState, circle: ICircle, isShifting: boolean) {
-        let putPieceResult = gameState.putPieceOnBoard(circle, isShifting);
+    processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
         this.getDrawerServiceForCurrentPlayer(gameState).numberOfPieces = gameState.getCurrentPlayer().availablePieces;
-
-        switch (putPieceResult) {
-            case PutPieceResult.FINISHED_TURN:
+        switch (moveResult) {
+            case MoveResult.FINISHED_TURN:
                 this.changeTurn(gameState);
                 break;
-            case PutPieceResult.CHANGED_STATE_TO_REMOVE:
-            case PutPieceResult.ERROR:
+            case MoveResult.CHANGED_STATE_TO_REMOVE:
+            case MoveResult.MOVE_NOT_ALLOWED:
+            case MoveResult.SELECTED_TO_SHIFT:
                 this.drawBoard(gameState);
                 break;
         }
-
-    }
-
-
-    performAnywhereMove(gameState: IGameState, selectedCircle: ICircle): void {
-        const circleForShift = gameState.isShiftAllowed(selectedCircle);
-
-        if (circleForShift) {
-            this.chosenForShift = selectedCircle;
-            this.highlightedCircles = this.findCirclesOnBoardForAnywhereMove(gameState);
-            this.drawBoard(gameState);
-
-        } else {
-            this.performShift(gameState, this.chosenForShift, selectedCircle);
-        }
-    }
-
-    findHighlightedCircle(selectedCircle: ICircle): ICircle {
-        return this.findIntersectingPiece(this.highlightedCircles, selectedCircle);
-    }
-
-    findCirclesForNearbyMove(gameState: IGameState, chosenCircle: ICircle): ICircle[] {
-        const foundCircles: ICircle[] = gameState.circles.filter(circle => circle.color === Color.BLACK);
-        const result = [];
-
-        for (const circle of foundCircles) {
-            if (Math.abs(this.boardCenter - chosenCircle.x) == Math.abs(this.boardCenter - chosenCircle.y)) {
-                if ((circle.x == chosenCircle.x && circle.y == this.boardCenter) || (circle.x == this.boardCenter && circle.y == chosenCircle.y)) {
-                    result.push(new HighlightedCircle(circle));
-                }
-            } else if (chosenCircle.x == this.boardCenter) {
-                if ((circle.y == chosenCircle.y
-                    && (circle.x == chosenCircle.x + Math.abs(this.boardCenter - chosenCircle.y) || circle.x == chosenCircle.x - Math.abs(this.boardCenter - chosenCircle.y))
-                ) || (circle.x == this.boardCenter && (circle.y == chosenCircle.y + 1 || circle.y == chosenCircle.y - 1))) {
-                    result.push(new HighlightedCircle(circle));
-                }
-
-            } else if (chosenCircle.y == this.boardCenter) {
-                if ((circle.x == chosenCircle.x
-                    && (circle.y == chosenCircle.y + Math.abs(this.boardCenter - chosenCircle.x) || circle.y == chosenCircle.y - Math.abs(this.boardCenter - chosenCircle.x))
-                ) || (circle.y == this.boardCenter && (circle.x == chosenCircle.x + 1 || circle.x == chosenCircle.x - 1))) {
-                    result.push(new HighlightedCircle(circle));
-                }
-            }
-        }
-        return result;
-    }
-
-    findCirclesOnBoardForAnywhereMove(gameState): ICircle[] {
-        const foundCircles: ICircle[] = gameState.circles.filter(circle => circle.color === Color.BLACK);
-        const result = [];
-        for (const circle of foundCircles) {
-            result.push(new HighlightedCircle(circle));
-        }
-        return result;
     }
 
     drawBoard(gameState: IGameState): void {
@@ -270,7 +168,7 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.canvasService.drawLine(3, 4, 3, 6);
 
         gameState.circles.forEach(circle => this.canvasService.drawCircle(circle));
-        this.highlightedCircles.forEach(circle => this.canvasService.drawCircle(circle));
+        gameState.highlightedCircles.forEach(circle => this.canvasService.drawCircle(circle));
 
         this.calculateStats(gameState);
 
@@ -332,7 +230,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     checkIfAnyCanMoveNearby(gameState: IGameState): boolean {
         let currentPlayerPieces = gameState.circles.filter(circle => circle.color == gameState.turn);
         for (const piece of currentPlayerPieces) {
-            if (this.findCirclesForNearbyMove(gameState, piece).length > 0) {
+            if (gameState.findDestinationsForNearbyMove(piece).length > 0) {
                 return true;
             }
         }

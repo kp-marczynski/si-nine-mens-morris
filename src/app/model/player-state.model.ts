@@ -16,7 +16,7 @@ export class PlayerState implements IPlayerState {
     lastPosition: ICircle;
 
     constructor() {
-        this.availablePieces = 9;
+        this.availablePieces = 4;
     }
 
     decreaseNumberOfAvailablePieces(): void {
