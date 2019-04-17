@@ -46,6 +46,9 @@ export class GameState implements IGameState {
         this.greenPlayerState = new PlayerState();
 
         this.allowedMoves = this.circles;
+
+        this.redPlayerState.usedPieces = 0;
+        this.greenPlayerState.usedPieces = 0;
     }
 
     setBaseRadiusSize(size: number) {
