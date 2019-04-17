@@ -1,0 +1,42 @@
+mat-card {
+    margin: 1rem;
+}
+
+.score-board {
+    width: 300px;
+    margin: 2rem auto;
+}
+
+.canvas-wrapper {
+    margin: 2rem auto;
+    max-width: 500px;
+}
+
+.game-wrapper {
+    margin: auto;
+    max-width: 600px;
+}
+
+canvas {
+    margin: auto;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+}
+
+h1 {
+    position: center;
+    text-align: center;
+}
+
+td {
+    min-width: 75px;
+    text-align: center;
+}
+
+th {
+    text-align: left;
+}
+
+.header-row > th {
+    text-align: center;
+}
