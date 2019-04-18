@@ -1,5 +1,5 @@
 import {CanvasService} from "./canvas.service";
-import {Color} from "../model/color.enum";
+import {Color} from "../model/enum/color.enum";
 
 export class DrawerService {
 

@@ -1,6 +1,6 @@
 import {ICircle} from "./circle.model";
-import {Color} from "./color.enum";
-import {PlayerType} from "./player-type.enum";
+import {Color} from "./enum/color.enum";
+import {PlayerType} from "./enum/player-type.enum";
 
 export interface IPlayerState {
     piecesInDrawer: number;

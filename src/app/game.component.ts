@@ -1,14 +1,14 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {HighlightedCircle, ICircle} from './model/circle.model';
-import {MoveType} from './model/move-type.enum';
+import {MoveType} from './model/enum/move-type.enum';
 import {CanvasService} from './service/canvas.service';
 import {IPosition} from './model/position.model';
-import {Color} from "./model/color.enum";
+import {Color} from "./model/enum/color.enum";
 import {DrawerService} from "./service/drawer.service";
 import {getWinSize, isBigScreen} from "./service/window-size.service";
 import {GameState, IGameState} from "./model/game-state.model";
-import {MoveResult} from "./model/move-result.enum";
-import {PlayerType} from "./model/player-type.enum";
+import {MoveResult} from "./model/enum/move-result.enum";
+import {PlayerType} from "./model/enum/player-type.enum";
 import {GameService} from "./service/game.service";
 
 @Component({
@@ -38,10 +38,10 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     ngAfterViewInit(): void {
-        setTimeout(() => this.afterVieInitCallback());
+        setTimeout(() => this.afterViewInitCallback());
     }
 
-    afterVieInitCallback(): void {
+    afterViewInitCallback(): void {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
         if (!isBigScreen()) {
             this.canvas.width = 0.8 * getWinSize();
@@ -89,7 +89,7 @@ export class GameComponent implements AfterViewInit, OnInit {
         const relativePosition = this.canvasService.getPositionInCanvas(event);
         const selectedCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
         if (selectedCircle) {
-            this.processMoveResult(this.gameState, this.gameService.performMove(this.gameState,selectedCircle));
+            this.processMoveResult(this.gameState, this.gameService.performMove(this.gameState, selectedCircle));
         }
     }
 
@@ -104,13 +104,13 @@ export class GameComponent implements AfterViewInit, OnInit {
                     case MoveType.NORMAL:
                     case MoveType.REMOVE_OPPONENT:
                     case MoveType.REMOVE_OPPONENT_2:
-                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState,hoveredCircle);
+                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
                         break;
                     case MoveType.MOVE_NEARBY:
                     case MoveType.MOVE_ANYWHERE:
-                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState,hoveredCircle);
+                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
                         if (!isMoveAllowed && this.gameState.chosenForShift != null) {
-                            isMoveAllowed = this.gameService.isShiftToAllowed(this.gameState,this.gameState.chosenForShift, hoveredCircle);
+                            isMoveAllowed = this.gameService.isShiftToAllowed(this.gameState, this.gameState.chosenForShift, hoveredCircle);
                         }
                         break;
                 }
@@ -125,6 +125,7 @@ export class GameComponent implements AfterViewInit, OnInit {
 
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
+        console.log(this.gameService.getAllPossibleNextMoveResults(gameState));
         this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;
         this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.piecesInDrawer;
         this.drawBoard(gameState);

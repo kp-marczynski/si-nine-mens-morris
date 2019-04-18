@@ -1,4 +1,4 @@
-import {Color} from "./color.enum";
+import {Color} from "./enum/color.enum";
 
 export interface ICircle {
     x: number;

@@ -1,8 +1,8 @@
-import {Color} from "./color.enum";
-import {MoveType} from "./move-type.enum";
+import {Color} from "./enum/color.enum";
+import {MoveType} from "./enum/move-type.enum";
 import {Circle, ICircle} from "./circle.model";
 import {IPlayerState, PlayerState} from "./player-state.model";
-import {PlayerType} from "./player-type.enum";
+import {PlayerType} from "./enum/player-type.enum";
 
 export interface IGameState {
     turn: Color;

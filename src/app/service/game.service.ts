@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {IPosition} from "../model/position.model";
-import {Color, getOpponentColor} from "../model/color.enum";
+import {Color, getOpponentColor} from "../model/enum/color.enum";
 import {changeColor, ICircle} from "../model/circle.model";
-import {MoveType} from "../model/move-type.enum";
-import {MoveResult} from "../model/move-result.enum";
+import {MoveType} from "../model/enum/move-type.enum";
+import {MoveResult} from "../model/enum/move-result.enum";
 import {IPlayerState} from "../model/player-state.model";
 import {GameState, IGameState} from "../model/game-state.model";
 
@@ -281,6 +281,7 @@ export class GameService {
         if (moveResult == MoveResult.FINISHED_TURN) {
             return this.initNewTurn(gameState);
         }
+        return moveResult;
     }
 
     private initNewTurn(gameState: IGameState): MoveResult {
@@ -335,26 +336,40 @@ export class GameService {
     }
 
     public getAllPossibleNextMoveResults(gameState: IGameState): IGameState[] {
-        return this.getAllPossibleNextMoveResultsForDestinations(gameState, gameState.allowedMoves);
+        let destinations: ICircle[] = [];
+        switch (gameState.moveType) {
+            case MoveType.NORMAL:
+                destinations = gameState.allowedMoves;
+                break;
+            case MoveType.MOVE_NEARBY:
+            case MoveType.MOVE_ANYWHERE:
+                destinations = this.findShiftSources(gameState);
+                break;
+            default:
+                break;
+        }
+        return this.getAllPossibleNextMoveResultsForDestinations(gameState, destinations);
     }
 
     private getAllPossibleNextMoveResultsForDestinations(gameState: IGameState, destinations: ICircle[]): IGameState[] {
-        const result: IGameState[] = [];
+        let result: IGameState[] = [];
         for (let possibleMove of destinations) {
             const newGameState = this.clone(gameState);
-            const possibleMoveClone = JSON.parse(JSON.stringify(possibleMove));
-            switch (this.performMove(newGameState, possibleMoveClone)) {
+            const moveDestination = newGameState.circles.find(circle => GameService.compareCirclesPosition(circle, possibleMove));
+            switch (this.performMove(newGameState, moveDestination)) {
                 case MoveResult.CHANGED_STATE_TO_REMOVE:
-                    result.concat(this.getAllPossibleNextMoveResultsForDestinations(newGameState, newGameState.allowedMoves));
+                    result = [...result, ...this.getAllPossibleNextMoveResultsForDestinations(newGameState, newGameState.allowedMoves)];
                     break;
                 case MoveResult.SELECTED_TO_SHIFT:
-                    result.concat(this.getAllPossibleNextMoveResultsForDestinations(newGameState, newGameState.shiftDestinations));
+                    result = [...result, ...this.getAllPossibleNextMoveResultsForDestinations(newGameState, newGameState.shiftDestinations)];
                     break;
                 case MoveResult.FINISHED_TURN:
                 case MoveResult.END_GAME:
                     result.push(newGameState);
                     break;
                 case MoveResult.MOVE_NOT_ALLOWED:
+                    console.log('Move not allowed');
+                    break;
                 default:
                     break;
             }
