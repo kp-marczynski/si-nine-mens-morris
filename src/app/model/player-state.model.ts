@@ -7,7 +7,8 @@ export interface IPlayerState {
     piecesOnBoard: number;
     points: number;
     color: Color;
-    lastPosition: ICircle;
+    previousPosition: ICircle;
+    lastMovedPiece: ICircle;
     playerType: PlayerType;
 }
 
@@ -16,7 +17,8 @@ export class PlayerState implements IPlayerState {
     piecesOnBoard: number;
     points: number;
 
-    lastPosition: ICircle;
+    previousPosition: ICircle;
+    lastMovedPiece: ICircle;
 
     constructor(public color: Color, public playerType) {
         this.piecesInDrawer = 9;

@@ -20,22 +20,33 @@ export class GameService {
         return JSON.parse(JSON.stringify(gameState));
     }
 
-    private getLastMove(gameState: IGameState): IPosition {
+    private getLastMovedPiece(gameState: IGameState): ICircle {
         switch (gameState.turn) {
             case Color.RED:
-                return gameState.redPlayerState.lastPosition;
+                return gameState.redPlayerState.lastMovedPiece;
             case Color.GREEN:
-                return gameState.greenPlayerState.lastPosition;
+                return gameState.greenPlayerState.lastMovedPiece;
         }
     }
 
-    private setLastMove(gameState: IGameState, circle: ICircle) {
-        switch (circle.color) {
+    private getPreviousPosition(gameState: IGameState): ICircle {
+        switch (gameState.turn) {
             case Color.RED:
-                gameState.redPlayerState.lastPosition = circle;
+                return gameState.redPlayerState.previousPosition;
+            case Color.GREEN:
+                return gameState.greenPlayerState.previousPosition;
+        }
+    }
+
+    private setLastMove(gameState: IGameState, previousPosition: ICircle, lastMovedPiece: ICircle) {
+        switch (previousPosition.color) {
+            case Color.RED:
+                gameState.redPlayerState.previousPosition = previousPosition;
+                gameState.redPlayerState.lastMovedPiece = lastMovedPiece;
                 break;
             case Color.GREEN:
-                gameState.greenPlayerState.lastPosition = circle;
+                gameState.greenPlayerState.previousPosition = previousPosition;
+                gameState.greenPlayerState.lastMovedPiece = lastMovedPiece;
                 break;
         }
     }
@@ -46,10 +57,10 @@ export class GameService {
 
     private findDestinationsForNormalMove(gameState: IGameState): ICircle[] {
         let pieces: ICircle[] = gameState.circles.filter(circle => circle.color === Color.BLACK);
-        let lastMove = this.getLastMove(gameState);
-        if (lastMove) {
-            pieces = pieces.filter(circle => !(circle.x == lastMove.x && circle.y == lastMove.y));
-        }
+        // let lastMove = this.getLastMovedPiece(gameState);
+        // if (lastMove) {
+        //     pieces = pieces.filter(circle => !(circle.x == lastMove.x && circle.y == lastMove.y));
+        // }
         return pieces;
     }
 
@@ -76,42 +87,42 @@ export class GameService {
         }
     }
 
-    private putPieceOnBoard(gameState: IGameState, circle: ICircle, isShifting: boolean): MoveResult {
-        if (circle == this.getLastMove(gameState)) {
-            alert('You cant put piece on last used position');
-        } else {
-            const currentPlayer = this.getCurrentPlayer(gameState);
+    private putPieceOnBoard(gameState: IGameState, destination: ICircle, isShifting: boolean): MoveResult {
+        // if (destination == this.getLastMovedPiece(gameState)) {
+        //     alert('You cant put piece on last used position');
+        // } else {
+        const currentPlayer = this.getCurrentPlayer(gameState);
 
-            let operationPossible: boolean = isShifting;
+        let operationPossible: boolean = isShifting;
 
-            if (currentPlayer.piecesInDrawer > 0) {
-                currentPlayer.piecesInDrawer--;
-                operationPossible = true;
-            }
-
-            if (operationPossible) {
-                changeColor(circle, gameState.turn);
-                if (!isShifting) {
-                    this.setLastMove(gameState, circle);
-                    this.getCurrentPlayer(gameState).piecesOnBoard++;
-                }
-
-                const pieces = gameState.circles.filter(c => c.color === gameState.turn);
-                const mill = this.checkForMill(pieces, circle);
-
-                switch (mill) {
-                    case 1:
-                        gameState.moveType = MoveType.REMOVE_OPPONENT;
-                        gameState.allowedMoves = this.findDestinationsForOpponentRemove(gameState);
-                        return MoveResult.CHANGED_STATE_TO_REMOVE;
-                    case 2:
-                        gameState.moveType = MoveType.REMOVE_OPPONENT_2;
-                        gameState.allowedMoves = this.findDestinationsForOpponentRemove(gameState);
-                        return MoveResult.CHANGED_STATE_TO_REMOVE;
-                }
-                return MoveResult.FINISHED_TURN;
-            }
+        if (currentPlayer.piecesInDrawer > 0) {
+            currentPlayer.piecesInDrawer--;
+            operationPossible = true;
         }
+
+        if (operationPossible) {
+            changeColor(destination, gameState.turn);
+            if (!isShifting) {
+                // this.setLastMove(gameState, destination);
+                this.getCurrentPlayer(gameState).piecesOnBoard++;
+            }
+
+            const pieces = gameState.circles.filter(c => c.color === gameState.turn);
+            const mill = this.checkForMill(pieces, destination);
+
+            switch (mill) {
+                case 1:
+                    gameState.moveType = MoveType.REMOVE_OPPONENT;
+                    gameState.allowedMoves = this.findDestinationsForOpponentRemove(gameState);
+                    return MoveResult.CHANGED_STATE_TO_REMOVE;
+                case 2:
+                    gameState.moveType = MoveType.REMOVE_OPPONENT_2;
+                    gameState.allowedMoves = this.findDestinationsForOpponentRemove(gameState);
+                    return MoveResult.CHANGED_STATE_TO_REMOVE;
+            }
+            return MoveResult.FINISHED_TURN;
+        }
+        // }
         return MoveResult.MOVE_NOT_ALLOWED;
     }
 
@@ -183,20 +194,25 @@ export class GameService {
                 }
             }
         }
-        let lastMove = this.getLastMove(gameState);
-        if (lastMove) {
-            return result.filter(circle => !(circle.x == lastMove.x && circle.y == lastMove.y));
+        let lastMove = this.getLastMovedPiece(gameState);
+        let previousPosition = this.getPreviousPosition(gameState);
+        console.log(chosenCircle);
+        console.log(lastMove);
+        console.log(previousPosition);
+        if (lastMove && GameService.compareCirclesPosition(lastMove, chosenCircle) && previousPosition) {
+            return result.filter(circle => !GameService.compareCirclesPosition(circle, previousPosition));
         } else {
             return result;
         }
     }
 
 
-    private findDestinationsForAnywhereMove(gameState: IGameState): ICircle[] {
+    private findDestinationsForAnywhereMove(gameState: IGameState, chosenCircle: ICircle): ICircle[] {
         const result: ICircle[] = gameState.circles.filter(circle => circle.color === Color.BLACK);
-        let lastMove = this.getLastMove(gameState);
-        if (lastMove) {
-            return result.filter(circle => !(circle.x == lastMove.x && circle.y == lastMove.y));
+        let lastMove = this.getLastMovedPiece(gameState);
+        let previousPosition = this.getPreviousPosition(gameState);
+        if (lastMove && GameService.compareCirclesPosition(lastMove, chosenCircle) && previousPosition) {
+            return result.filter(circle => !GameService.compareCirclesPosition(circle, previousPosition));
         } else {
             return result;
         }
@@ -216,7 +232,7 @@ export class GameService {
     private performRemoveMove(gameState: IGameState, selectedCircle: ICircle): MoveResult {
         const removeAllowed = this.isMoveAllowed(gameState, selectedCircle);
         if (removeAllowed && selectedCircle.x != null && selectedCircle.y != null) {
-            this.setLastMove(gameState, selectedCircle);
+            // this.setLastMove(gameState, selectedCircle);
             changeColor(selectedCircle, Color.BLACK);
             this.getCurrentPlayer(gameState).points++;
             this.getOpponentPlayer(gameState).piecesOnBoard--;
@@ -238,7 +254,7 @@ export class GameService {
                     gameState.shiftDestinations = this.findDestinationsForNearbyMove(gameState, selectedCircle);
                     break;
                 case MoveType.MOVE_ANYWHERE:
-                    gameState.shiftDestinations = this.findDestinationsForAnywhereMove(gameState);
+                    gameState.shiftDestinations = this.findDestinationsForAnywhereMove(gameState, selectedCircle);
                     break;
                 default:
                     return MoveResult.MOVE_NOT_ALLOWED;
@@ -249,7 +265,7 @@ export class GameService {
             const chosen = gameState.chosenForShift;
             gameState.chosenForShift = null;
 
-            this.setLastMove(gameState, chosen);
+            this.setLastMove(gameState, chosen, selectedCircle);
             changeColor(chosen, Color.BLACK);
             return this.putPieceOnBoard(gameState, gameState.circles.find(circle => circle.x == selectedCircle.x && circle.y == selectedCircle.y), true);
         }
