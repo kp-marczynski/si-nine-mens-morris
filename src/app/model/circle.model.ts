@@ -29,19 +29,16 @@ export class HighlightedCircle implements ICircle {
     ) {
         this.x = circle.x;
         this.y = circle.y;
-        this.radius = circle.radius * 2;
+        this.radius = 2;
     }
 
 }
 
 export function changeColor(circle: Circle, color: Color): void {
-    let radiusFactor = 1;
-    if (circle.color == Color.BLACK && color != Color.BLACK) {
-        radiusFactor = 2;
+    if (color == Color.BLACK) {
+        circle.radius = 1;
+    } else {
+        circle.radius = 2;
     }
-    if (color == Color.BLACK && circle.color != Color.BLACK) {
-        radiusFactor = 0.5;
-    }
-    circle.radius *= radiusFactor;
     circle.color = color;
 }
