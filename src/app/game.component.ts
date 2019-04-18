@@ -174,5 +174,8 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     changePlayerType(playerState: IPlayerState) {
         changePlayerType(playerState);
+        if (this.gameService.getCurrentPlayer(this.gameState).playerType == PlayerType.COMPUTER) {
+            setTimeout(() => this.processComputerMove(this.gameState));
+        }
     }
 }
