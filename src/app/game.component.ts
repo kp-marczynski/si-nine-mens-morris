@@ -10,6 +10,8 @@ import {GameState, IGameState} from "./model/game-state.model";
 import {MoveResult} from "./model/enum/move-result.enum";
 import {PlayerType} from "./model/enum/player-type.enum";
 import {GameService} from "./service/game.service";
+import {AiPlayerService} from "./service/ai-player.service";
+import {changePlayerType, IPlayerState} from "./model/player-state.model";
 
 @Component({
     selector: 'app-root',
@@ -30,7 +32,7 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     gameState: IGameState = null;
 
-    constructor(private gameService: GameService) {
+    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService) {
     }
 
     ngOnInit(): void {
@@ -86,48 +88,49 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     onClickOrTouchListener(event: UIEvent) {
         event.preventDefault();
-        const relativePosition = this.canvasService.getPositionInCanvas(event);
-        const selectedCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
-        if (selectedCircle) {
-            this.processMoveResult(this.gameState, this.gameService.performMove(this.gameState, selectedCircle));
+        if (this.gameService.getCurrentPlayer(this.gameState).playerType == PlayerType.HUMAN) {
+            const relativePosition = this.canvasService.getPositionInCanvas(event);
+            const selectedCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
+            if (selectedCircle) {
+                this.processMoveResult(this.gameState, this.gameService.performMove(this.gameState, selectedCircle));
+            }
         }
     }
 
     addCanvasOnMouseMoveListener(): void {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
-            const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
-            const hoveredCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
-            let isMoveAllowed = false;
+            if (this.gameService.getCurrentPlayer(this.gameState).playerType == PlayerType.HUMAN) {
+                const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
+                const hoveredCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
+                let isMoveAllowed = false;
 
-            if (hoveredCircle) {
-                switch (this.gameState.moveType) {
-                    case MoveType.NORMAL:
-                    case MoveType.REMOVE_OPPONENT:
-                    case MoveType.REMOVE_OPPONENT_2:
-                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
-                        break;
-                    case MoveType.MOVE_NEARBY:
-                    case MoveType.MOVE_ANYWHERE:
-                        isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
-                        if (!isMoveAllowed && this.gameState.chosenForShift != null) {
-                            isMoveAllowed = this.gameService.isShiftToAllowed(this.gameState, this.gameState.chosenForShift, hoveredCircle);
-                        }
-                        break;
+                if (hoveredCircle) {
+                    switch (this.gameState.moveType) {
+                        case MoveType.NORMAL:
+                        case MoveType.REMOVE_OPPONENT:
+                        case MoveType.REMOVE_OPPONENT_2:
+                            isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
+                            break;
+                        case MoveType.MOVE_NEARBY:
+                        case MoveType.MOVE_ANYWHERE:
+                            isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
+                            if (!isMoveAllowed && this.gameState.chosenForShift != null) {
+                                isMoveAllowed = this.gameService.isShiftToAllowed(this.gameState, this.gameState.chosenForShift, hoveredCircle);
+                            }
+                            break;
+                    }
                 }
-            }
-            if (isMoveAllowed) {
-                this.canvas.style.cursor = 'pointer';
-            } else {
-                this.canvas.style.cursor = 'default';
+                if (isMoveAllowed) {
+                    this.canvas.style.cursor = 'pointer';
+                } else {
+                    this.canvas.style.cursor = 'default';
+                }
             }
         });
     }
 
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
-        console.log(this.gameService.getAllPossibleNextMoveResults(gameState));
-        this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;
-        this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.piecesInDrawer;
         this.drawBoard(gameState);
     }
 
@@ -141,11 +144,23 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.canvasService.drawLine(3, 0, 3, 2);
         this.canvasService.drawLine(3, 4, 3, 6);
 
+        this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;
+        this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.piecesInDrawer;
+
         gameState.circles.forEach(circle => this.canvasService.drawCircle(circle));
         gameState.shiftDestinations.forEach(circle => this.canvasService.drawCircle(new HighlightedCircle(circle)));
 
         this.redDrawerService.drawDrawer();
         this.greenDrawerService.drawDrawer();
+
+        if (this.gameService.getCurrentPlayer(gameState).playerType == PlayerType.COMPUTER) {
+            setTimeout(() => this.processComputerMove(gameState));
+        }
+    }
+
+    processComputerMove(gameState: IGameState) {
+        this.gameState = this.aiPlayerService.minimax(gameState);
+        this.drawBoard(this.gameState);
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {
@@ -155,5 +170,9 @@ export class GameComponent implements AfterViewInit, OnInit {
             }
         }
         return null;
+    }
+
+    changePlayerType(playerState: IPlayerState) {
+        changePlayerType(playerState);
     }
 }

@@ -196,9 +196,7 @@ export class GameService {
         }
         let lastMove = this.getLastMovedPiece(gameState);
         let previousPosition = this.getPreviousPosition(gameState);
-        console.log(chosenCircle);
-        console.log(lastMove);
-        console.log(previousPosition);
+
         if (lastMove && GameService.compareCirclesPosition(lastMove, chosenCircle) && previousPosition) {
             return result.filter(circle => !GameService.compareCirclesPosition(circle, previousPosition));
         } else {
@@ -392,5 +390,9 @@ export class GameService {
 
         }
         return result;
+    }
+
+    getValue(gameState: IGameState): number {
+        return gameState.greenPlayerState.points - gameState.redPlayerState.points;
     }
 }

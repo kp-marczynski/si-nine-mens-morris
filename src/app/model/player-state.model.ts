@@ -27,3 +27,13 @@ export class PlayerState implements IPlayerState {
     }
 }
 
+export function changePlayerType(playerState: IPlayerState): void {
+    switch (playerState.playerType) {
+        case PlayerType.COMPUTER:
+            playerState.playerType = PlayerType.HUMAN;
+            break;
+        case PlayerType.HUMAN:
+            playerState.playerType = PlayerType.COMPUTER;
+            break;
+    }
+}
