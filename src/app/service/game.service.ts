@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
-import {IPosition} from "../model/position.model";
 import {Color, getOpponentColor} from "../model/enum/color.enum";
 import {changeColor, ICircle} from "../model/circle.model";
 import {MoveType} from "../model/enum/move-type.enum";
 import {MoveResult} from "../model/enum/move-result.enum";
 import {IPlayerState} from "../model/player-state.model";
 import {GameState, IGameState} from "../model/game-state.model";
+import {cloneDeep} from 'lodash';
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +17,7 @@ export class GameService {
     }
 
     clone(gameState: IGameState): GameState {
-        return JSON.parse(JSON.stringify(gameState));
+        return cloneDeep(gameState);
     }
 
     private getLastMovedPiece(gameState: IGameState): ICircle {

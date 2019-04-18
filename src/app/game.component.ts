@@ -125,7 +125,7 @@ export class GameComponent implements AfterViewInit, OnInit {
 
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
-        // console.log(this.gameService.getAllPossibleNextMoveResults(gameState));
+        console.log(this.gameService.getAllPossibleNextMoveResults(gameState));
         this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;
         this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.piecesInDrawer;
         this.drawBoard(gameState);
