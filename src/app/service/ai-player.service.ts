@@ -16,7 +16,7 @@ export class AiPlayerService {
         const children = this.gameService.getAllPossibleNextMoveResults(gameState);
         for (const child of children) {
             let childValue = this.minimaxRecursive(child, false, 0);
-            if (resultValue == null || childValue > resultValue) {
+            if((resultValue != null && childValue == resultValue && Math.random() > 0.5) || (resultValue == null || childValue > resultValue)){
                 resultValue = childValue;
                 result = child;
             }
