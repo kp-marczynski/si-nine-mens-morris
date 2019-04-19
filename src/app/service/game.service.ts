@@ -92,6 +92,7 @@ export class GameService {
         //     alert('You cant put piece on last used position');
         // } else {
         const currentPlayer = this.getCurrentPlayer(gameState);
+        gameState.moveCount++;
 
         let operationPossible: boolean = isShifting;
 
@@ -308,7 +309,7 @@ export class GameService {
 
         if (allPieces < 3) {
             gameState.moveType = MoveType.END_GAME;
-            alert("Player " + gameState.turn + " has lost");
+            // alert("Player " + gameState.turn + " has lost");
         } else if (availablePieces > 0) {
             gameState.moveType = MoveType.NORMAL;
         } else if (usedPieces === 3) {

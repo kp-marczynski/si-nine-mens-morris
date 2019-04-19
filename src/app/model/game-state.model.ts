@@ -13,6 +13,7 @@ export interface IGameState {
     greenPlayerState: IPlayerState;
     chosenForShift: ICircle;
     allowedMoves: ICircle[];
+    moveCount: number;
 }
 
 const boardCenter = 3;
@@ -28,12 +29,14 @@ export class GameState implements IGameState {
     redPlayerState: IPlayerState;
     greenPlayerState: IPlayerState;
     allowedMoves: ICircle[];
+    moveCount: number;
 
     constructor(redPlayerType: PlayerType, greenPlayerType: PlayerType) {
         this.redPlayerState = new PlayerState(Color.RED, redPlayerType);
         this.greenPlayerState = new PlayerState(Color.GREEN, greenPlayerType);
 
         this.allowedMoves = this.circles;
+        this.moveCount = 0;
 
         this.redPlayerState.piecesOnBoard = 0;
         this.greenPlayerState.piecesOnBoard = 0;

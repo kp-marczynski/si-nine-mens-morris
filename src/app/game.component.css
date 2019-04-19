@@ -40,3 +40,9 @@ th {
 .header-row > th {
     text-align: center;
 }
+
+/*.header-wrapper {*/
+    /*min-width: 100px;*/
+    /*text-align: center;*/
+    /*display: inline-block;*/
+/*}*/

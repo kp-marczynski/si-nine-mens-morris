@@ -131,7 +131,11 @@ export class GameComponent implements AfterViewInit, OnInit {
 
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
-        this.drawBoard(gameState);
+        if (moveResult == MoveResult.END_GAME) {
+            alert("Player " + gameState.turn + " has lost");
+        } else {
+            this.drawBoard(gameState);
+        }
     }
 
     drawBoard(gameState: IGameState): void {
@@ -160,7 +164,11 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     processComputerMove(gameState: IGameState) {
         this.gameState = this.aiPlayerService.minimax(gameState);
-        this.drawBoard(this.gameState);
+        if (this.gameState) {
+            this.drawBoard(this.gameState);
+        } else {
+            alert("Player " + gameState.turn + " has lost");
+        }
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {

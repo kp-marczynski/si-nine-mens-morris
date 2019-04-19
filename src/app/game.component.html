@@ -1,5 +1,10 @@
 <div *ngIf="gameState">
-    <h1>{{gameState.turn}} : {{gameState.moveType}}</h1>
+    <h1><span class="header-wrapper">{{gameState.moveCount}}</span>
+        <span> : </span>
+        <span class="header-wrapper">{{gameState.turn}}</span>
+        <span> : </span>
+        <span class="header-wrapper">{{gameState.moveType}}</span>
+    </h1>
     <div class="game-wrapper">
         <mat-card class="canvas-wrapper" id="canvas-wrapper">
             <canvas id="canvas" width="500" height="500">></canvas>
@@ -27,8 +32,16 @@
             </tr>
             <tr>
                 <th>Player type:</th>
-                <td><button mat-button (click)="changePlayerType(gameState.redPlayerState)">{{gameState.redPlayerState.playerType}}</button></td>
-                <td><button mat-button (click)="changePlayerType(gameState.greenPlayerState)">{{gameState.greenPlayerState.playerType}}</button></td>
+                <td>
+                    <button mat-button (click)="changePlayerType(gameState.redPlayerState)">
+                        {{gameState.redPlayerState.playerType}}
+                    </button>
+                </td>
+                <td>
+                    <button mat-button (click)="changePlayerType(gameState.greenPlayerState)">
+                        {{gameState.greenPlayerState.playerType}}
+                    </button>
+                </td>
             </tr>
             <tr>
                 <th>Points:</th>
