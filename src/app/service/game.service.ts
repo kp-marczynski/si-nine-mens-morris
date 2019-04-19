@@ -394,6 +394,6 @@ export class GameService {
     }
 
     getValue(gameState: IGameState): number {
-        return gameState.greenPlayerState.points - gameState.redPlayerState.points;
+        return (gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1);// / gameState.moveCount;
     }
 }

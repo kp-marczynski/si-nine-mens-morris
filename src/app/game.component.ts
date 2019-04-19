@@ -132,7 +132,8 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
         if (moveResult == MoveResult.END_GAME) {
-            alert("Player " + gameState.turn + " has lost");
+            console.log(gameState);
+            // alert("Player " + gameState.turn + " has lost");
         } else {
             this.drawBoard(gameState);
         }
@@ -167,7 +168,9 @@ export class GameComponent implements AfterViewInit, OnInit {
         if (this.gameState) {
             this.drawBoard(this.gameState);
         } else {
-            alert("Player " + gameState.turn + " has lost");
+            console.log("no moves");
+            console.log(gameState);
+            // alert("Player " + gameState.turn + " has lost");
         }
     }
 

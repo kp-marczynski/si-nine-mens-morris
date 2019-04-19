@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {GameService} from "./game.service";
 import {IGameState} from "../model/game-state.model";
 import {Color} from "../model/enum/color.enum";
+import {GameStateNode, IGameStateNode} from "../model/game-state-node.model";
+import {MoveType} from "../model/enum/move-type.enum";
 
 @Injectable({
     providedIn: 'root'
@@ -12,24 +14,14 @@ export class AiPlayerService {
     }
 
     public minimax(gameState: IGameState): IGameState {
-        let result: IGameState = null;
-        const children = this.gameService.getAllPossibleNextMoveResults(gameState);
-        let isMaximizing: boolean = gameState.turn == Color.GREEN;
-        // for (const child of children) {
-        //     let childValue = this.minimaxRecursive(child, isMaximizing, 0);
-        //     if ((resultValue != null && childValue == resultValue && Math.random() > 0.5) || (resultValue == null || (!isMaximizing && childValue > resultValue) || (isMaximizing && childValue < resultValue))) {
-        //         resultValue = childValue;
-        //         result = child;
-        //     }
-        // }
-        const childrenValues: number[] = children.map(child => this.minimaxRecursive(child, !isMaximizing, 1));
-        const value = isMaximizing ? Math.max(...childrenValues) : Math.min(...childrenValues);
-        for (let i = 0; i < children.length; ++i) {
-            if (childrenValues[i] == value && (result == null || Math.random() > 0.7)) {
-                result = children[i];
-            }
+        if (gameState.moveType == MoveType.END_GAME) {
+            return gameState;
         }
-        return result;
+        // let result: IGameState = null;
+        // const children = this.gameService.getAllPossibleNextMoveResults(gameState);
+        let isMaximizing: boolean = gameState.turn == Color.GREEN;
+
+        return this.minimaxBroadFirst(gameState, isMaximizing, Date.now(), 2 * 10e5);
     }
 
     private minimaxRecursive(gameState: IGameState, isMaximizing: boolean, level: number): number {
@@ -45,6 +37,27 @@ export class AiPlayerService {
         }
         console.log(childrenValues);
         return isMaximizing ? Math.max(...childrenValues) : Math.min(...childrenValues);
+    }
+
+    private minimaxBroadFirst(gameState: IGameState, isMaximizing: boolean, timeStart: number, timeout: number): IGameState {
+        const root = new GameStateNode(gameState, isMaximizing, this.gameService.getValue(gameState));
+        let firstQueue: IGameStateNode[] = [root];
+        let secondQueue: IGameStateNode[] = [];
+        let level = 0;
+        while ((Date.now() - timeStart) < timeout / firstQueue.length) {
+            level++;
+            console.log('level: ' + level);
+            for (const firstQueueElem of firstQueue) {
+                const children = this.gameService.getAllPossibleNextMoveResults(firstQueueElem.root).map(state => new GameStateNode(state, !firstQueueElem.isMaximizing, this.gameService.getValue(state)));
+                firstQueueElem.children = children;
+                secondQueue = [...secondQueue, ...children];
+            }
+            firstQueue = secondQueue;
+            secondQueue = [];
+        }
+        console.log('calc val');
+        root.calcValue();
+        return root.getBestChild().root;
     }
 
 }
