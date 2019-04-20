@@ -144,11 +144,11 @@ export class GameComponent implements AfterViewInit, OnInit {
 
 
     processMoveResult(gameState: IGameState): void {
+        this.drawBoard(gameState);
         if (gameState.moveType == MoveType.END_GAME) {
             console.log(gameState);
             // alert("Player " + gameState.turn + " has lost");
         } else {
-            this.drawBoard(gameState);
             if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
                 setTimeout(() => this.performComputerMove(gameState));
             }
@@ -180,9 +180,9 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     performComputerMove(gameState: IGameState) {
-        this.gameState = this.aiPlayerService.minimax(gameState);
-        if (this.gameState) {
-            this.drawBoard(this.gameState);
+        let state = this.aiPlayerService.minimax(gameState);
+        if (state) {
+            this.gameState = state;
             this.processMoveResult(this.gameState);
         } else {
             console.log("no moves");
