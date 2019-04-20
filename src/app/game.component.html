@@ -33,13 +33,13 @@
             <tr>
                 <th>Player type:</th>
                 <td>
-                    <button mat-button (click)="changePlayerType(gameState.redPlayerState)">
-                        {{gameState.redPlayerState.playerType}}
+                    <button mat-button (click)="changePlayerType('RED')">
+                        {{redPlayerType}}
                     </button>
                 </td>
                 <td>
-                    <button mat-button (click)="changePlayerType(gameState.greenPlayerState)">
-                        {{gameState.greenPlayerState.playerType}}
+                    <button mat-button (click)="changePlayerType('GREEN')">
+                        {{greenPlayerType}}
                     </button>
                 </td>
             </tr>

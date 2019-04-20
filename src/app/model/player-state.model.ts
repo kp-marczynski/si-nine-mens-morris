@@ -1,6 +1,5 @@
 import {ICircle} from "./circle.model";
 import {Color} from "./enum/color.enum";
-import {PlayerType} from "./enum/player-type.enum";
 
 export interface IPlayerState {
     piecesInDrawer: number;
@@ -9,7 +8,6 @@ export interface IPlayerState {
     color: Color;
     previousPosition: ICircle;
     lastMovedPiece: ICircle;
-    playerType: PlayerType;
 }
 
 export class PlayerState implements IPlayerState {
@@ -27,13 +25,3 @@ export class PlayerState implements IPlayerState {
     }
 }
 
-export function changePlayerType(playerState: IPlayerState): void {
-    switch (playerState.playerType) {
-        case PlayerType.COMPUTER:
-            playerState.playerType = PlayerType.HUMAN;
-            break;
-        case PlayerType.HUMAN:
-            playerState.playerType = PlayerType.COMPUTER;
-            break;
-    }
-}

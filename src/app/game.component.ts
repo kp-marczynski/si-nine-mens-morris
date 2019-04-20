@@ -7,11 +7,9 @@ import {Color} from "./model/enum/color.enum";
 import {DrawerService} from "./service/drawer.service";
 import {getWinSize, isBigScreen} from "./service/window-size.service";
 import {GameState, IGameState} from "./model/game-state.model";
-import {MoveResult} from "./model/enum/move-result.enum";
 import {PlayerType} from "./model/enum/player-type.enum";
 import {GameService} from "./service/game.service";
 import {AiPlayerService} from "./service/ai-player.service";
-import {changePlayerType, IPlayerState} from "./model/player-state.model";
 
 @Component({
     selector: 'app-root',
@@ -32,7 +30,12 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     gameState: IGameState = null;
 
+    redPlayerType: PlayerType;
+    greenPlayerType: PlayerType;
+
     constructor(private gameService: GameService, private aiPlayerService: AiPlayerService) {
+        this.redPlayerType = PlayerType.HUMAN;
+        this.greenPlayerType = PlayerType.HUMAN;
     }
 
     ngOnInit(): void {
@@ -88,18 +91,28 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     onClickOrTouchListener(event: UIEvent) {
         event.preventDefault();
-        if (this.gameService.getCurrentPlayer(this.gameState).playerType == PlayerType.HUMAN) {
+        if (this.getCurrentPlayerType(this.gameState) == PlayerType.HUMAN) {
             const relativePosition = this.canvasService.getPositionInCanvas(event);
             const selectedCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
             if (selectedCircle) {
-                this.processMoveResult(this.gameState, this.gameService.performMove(this.gameState, selectedCircle));
+                this.gameService.performMove(this.gameState, selectedCircle);
+                this.processMoveResult(this.gameState);
             }
+        }
+    }
+
+    getCurrentPlayerType(gameState: IGameState): PlayerType {
+        switch (gameState.turn) {
+            case Color.RED:
+                return this.redPlayerType;
+            case Color.GREEN:
+                return this.greenPlayerType;
         }
     }
 
     addCanvasOnMouseMoveListener(): void {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
-            if (this.gameService.getCurrentPlayer(this.gameState).playerType == PlayerType.HUMAN) {
+            if (this.getCurrentPlayerType(this.gameState) == PlayerType.HUMAN) {
                 const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
                 const hoveredCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
                 let isMoveAllowed = false;
@@ -130,12 +143,15 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
 
-    processMoveResult(gameState: IGameState, moveResult: MoveResult): void {
-        if (moveResult == MoveResult.END_GAME) {
+    processMoveResult(gameState: IGameState): void {
+        if (gameState.moveType == MoveType.END_GAME) {
             console.log(gameState);
             // alert("Player " + gameState.turn + " has lost");
         } else {
             this.drawBoard(gameState);
+            if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
+                setTimeout(() => this.performComputerMove(gameState));
+            }
         }
     }
 
@@ -158,15 +174,16 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.redDrawerService.drawDrawer();
         this.greenDrawerService.drawDrawer();
 
-        if (this.gameService.getCurrentPlayer(gameState).playerType == PlayerType.COMPUTER) {
-            setTimeout(() => this.processComputerMove(gameState));
-        }
+        // if (this.gameService.getCurrentPlayer(gameState).playerType == PlayerType.COMPUTER) {
+        //     setTimeout(() => this.performComputerMove(gameState));
+        // }
     }
 
-    processComputerMove(gameState: IGameState) {
+    performComputerMove(gameState: IGameState) {
         this.gameState = this.aiPlayerService.minimax(gameState);
         if (this.gameState) {
             this.drawBoard(this.gameState);
+            this.processMoveResult(this.gameState);
         } else {
             console.log("no moves");
             console.log(gameState);
@@ -183,10 +200,37 @@ export class GameComponent implements AfterViewInit, OnInit {
         return null;
     }
 
-    changePlayerType(playerState: IPlayerState) {
-        changePlayerType(playerState);
-        if (this.gameService.getCurrentPlayer(this.gameState).playerType == PlayerType.COMPUTER) {
-            setTimeout(() => this.processComputerMove(this.gameState));
+    getPlayerTypeByColor(color: Color): PlayerType {
+        switch (color) {
+            case Color.RED:
+                return this.redPlayerType;
+            case Color.GREEN:
+                return this.greenPlayerType;
+        }
+    }
+
+    changePlayerType(colorString: string) {
+        const color: Color = Color[colorString];
+        let playerType = this.getPlayerTypeByColor(color);
+        let result: PlayerType;
+        switch (playerType) {
+            case PlayerType.HUMAN:
+                result = PlayerType.COMPUTER;
+                break;
+            case  PlayerType.COMPUTER:
+                result = PlayerType.HUMAN;
+                break;
+        }
+        switch (color) {
+            case Color.RED:
+                this.redPlayerType = result;
+                break;
+            case Color.GREEN:
+                this.greenPlayerType = result;
+                break;
+        }
+        if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
+            setTimeout(() => this.performComputerMove(this.gameState));
         }
     }
 }
