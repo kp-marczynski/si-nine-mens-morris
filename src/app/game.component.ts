@@ -155,9 +155,13 @@ export class GameComponent implements AfterViewInit, OnInit {
         } else {
             if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
                 // setTimeout(() => this.performComputerMove(gameState));
-                setTimeout(() => this.canvas.dispatchEvent(new Event('computer-move')), 0);
+                setTimeout(this.dispatchComputerMoveEvent, 0);
             }
         }
+    }
+
+    dispatchComputerMoveEvent() {
+        this.canvas.dispatchEvent(new Event('computer-move'));
     }
 
     drawBoard(gameState: IGameState): void {
@@ -235,7 +239,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                 break;
         }
         if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
-            setTimeout(() => this.canvas.dispatchEvent(new Event('computer-move')), 0);
+            setTimeout(this.dispatchComputerMoveEvent, 0);
         }
     }
 }
