@@ -9,3 +9,8 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
     background-color: #f4f4f4;
 }
+
+footer {
+    text-align: center;
+    margin: 1rem;
+}
