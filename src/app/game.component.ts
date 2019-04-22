@@ -43,7 +43,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     ngAfterViewInit(): void {
-        setTimeout(() => this.afterViewInitCallback());
+        setTimeout(() => this.afterViewInitCallback(), 0);
     }
 
     afterViewInitCallback(): void {
@@ -79,6 +79,7 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.addCanvasOnClickListener();
         this.addCanvasOnMouseMoveListener();
         this.addCanvasOnTouchListener();
+        this.addCanvasComputerMoveListener();
     }
 
     addCanvasOnTouchListener(): void {
@@ -142,6 +143,9 @@ export class GameComponent implements AfterViewInit, OnInit {
         });
     }
 
+    addCanvasComputerMoveListener(): void {
+        this.canvas.addEventListener('computer-move', () => this.performComputerMove(this.gameState));
+    }
 
     processMoveResult(gameState: IGameState): void {
         this.drawBoard(gameState);
@@ -149,8 +153,9 @@ export class GameComponent implements AfterViewInit, OnInit {
             console.log(gameState);
             // alert("Player " + gameState.turn + " has lost");
         } else {
-            if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
-                setTimeout(() => this.performComputerMove(gameState));
+            if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
+                // setTimeout(() => this.performComputerMove(gameState));
+                setTimeout(() => this.canvas.dispatchEvent(new Event('computer-move')), 0);
             }
         }
     }
@@ -230,7 +235,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                 break;
         }
         if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
-            setTimeout(() => this.performComputerMove(this.gameState));
+            setTimeout(() => this.canvas.dispatchEvent(new Event('computer-move')), 0);
         }
     }
 }
