@@ -6,6 +6,7 @@ import {MoveResult} from "../model/enum/move-result.enum";
 import {IPlayerState} from "../model/player-state.model";
 import {GameState, IGameState} from "../model/game-state.model";
 import {cloneDeep} from 'lodash';
+import {BasicMove, ShiftMove} from "../model/move.model";
 
 @Injectable({
     providedIn: 'root'
@@ -92,7 +93,6 @@ export class GameService {
         //     alert('You cant put piece on last used position');
         // } else {
         const currentPlayer = this.getCurrentPlayer(gameState);
-        gameState.moveCount++;
 
         let operationPossible: boolean = isShifting;
 
@@ -223,6 +223,8 @@ export class GameService {
 
     private performNormalMove(gameState: IGameState, selectedCircle: ICircle): MoveResult {
         if (this.isMoveAllowed(gameState, selectedCircle)) {
+            gameState.moveCount++;
+            gameState.moves.push(new BasicMove(gameState.moveCount, gameState.turn, gameState.moveType, selectedCircle));
             return this.putPieceOnBoard(gameState, selectedCircle, false);
         }
         return MoveResult.MOVE_NOT_ALLOWED;
@@ -236,9 +238,11 @@ export class GameService {
             this.getCurrentPlayer(gameState).points++;
             this.getOpponentPlayer(gameState).piecesOnBoard--;
             if (gameState.moveType === MoveType.REMOVE_OPPONENT_2) {
+                gameState.moves.push(new BasicMove(gameState.moveCount, gameState.turn, gameState.moveType, selectedCircle));
                 gameState.moveType = MoveType.REMOVE_OPPONENT;
                 return MoveResult.CHANGED_STATE_TO_REMOVE;
             } else {
+                gameState.moves.push(new BasicMove(gameState.moveCount, gameState.turn, gameState.moveType, selectedCircle));
                 return MoveResult.FINISHED_TURN;
             }
         }
@@ -266,6 +270,8 @@ export class GameService {
 
             this.setLastMove(gameState, chosen, selectedCircle);
             changeColor(chosen, Color.BLACK);
+            gameState.moveCount++;
+            gameState.moves.push(new ShiftMove(gameState.moveCount, gameState.turn, gameState.moveType, chosen, selectedCircle));
             return this.putPieceOnBoard(gameState, gameState.circles.find(circle => circle.x == selectedCircle.x && circle.y == selectedCircle.y), true);
         }
         return MoveResult.MOVE_NOT_ALLOWED;

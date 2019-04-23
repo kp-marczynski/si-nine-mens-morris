@@ -10,6 +10,7 @@ import {GameState, IGameState} from "./model/game-state.model";
 import {PlayerType} from "./model/enum/player-type.enum";
 import {GameService} from "./service/game.service";
 import {AiPlayerService} from "./service/ai-player.service";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
     selector: 'app-root',
@@ -33,7 +34,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     redPlayerType: PlayerType;
     greenPlayerType: PlayerType;
 
-    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService) {
+    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar) {
         this.redPlayerType = PlayerType.HUMAN;
         this.greenPlayerType = PlayerType.HUMAN;
     }
@@ -177,6 +178,7 @@ export class GameComponent implements AfterViewInit, OnInit {
             let state = this.aiPlayerService.minimax(this.gameState);
             if (state) {
                 this.gameState = state;
+                this.showSnackBarWithMoveResult(state);
             } else {
                 console.log("no moves");
                 console.log(this.gameState);
@@ -184,6 +186,21 @@ export class GameComponent implements AfterViewInit, OnInit {
             resolve();
         }, 100)).then(() => this.processMoveResult(this.gameState));
 
+    }
+
+    showSnackBarWithMoveResult(gameState: IGameState) {
+        const moves = gameState.moves.filter(move => move.count === gameState.moveCount);
+        let message: string = '';
+        message += '=== ' + moves[0].color + ' === ';
+        for (let i = 0; i < moves.length; ++i) {
+            message += moves[i].moveType + ': ' + moves[i].moveDescription;
+            if (i != moves.length - 1) {
+                message += '; ';
+            }
+        }
+        this.snackBar.open(message, 'OK', {
+            duration: 3000
+        });
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {

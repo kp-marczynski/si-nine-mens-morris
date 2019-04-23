@@ -1,5 +1,5 @@
 <div *ngIf="gameState">
-    <h1><span class="header-wrapper">{{gameState.moveCount}}</span>
+    <h1><span class="header-wrapper">{{gameState.moveCount + 1}}</span>
         <span> : </span>
         <span class="header-wrapper">{{gameState.turn}}</span>
         <span> : </span>
@@ -59,6 +59,17 @@
                 <td>{{gameState.greenPlayerState.piecesOnBoard}}</td>
             </tr>
         </table>
+    </mat-card>
+    <mat-card class="score-board" *ngIf="gameState.moves.length != 0">
+        <mat-card-header>
+            <h1>Moves</h1>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-nav-list>
+                <mat-list-item
+                        *ngFor="let move of gameState.moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
+            </mat-nav-list>
+        </mat-card-content>
     </mat-card>
     <mat-card>
         <mat-card-header>

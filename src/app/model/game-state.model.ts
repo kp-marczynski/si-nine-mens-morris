@@ -3,6 +3,7 @@ import {MoveType} from "./enum/move-type.enum";
 import {Circle, ICircle} from "./circle.model";
 import {IPlayerState, PlayerState} from "./player-state.model";
 import {PlayerType} from "./enum/player-type.enum";
+import {IMove} from "./move.model";
 
 export interface IGameState {
     turn: Color;
@@ -14,6 +15,7 @@ export interface IGameState {
     chosenForShift: ICircle;
     allowedMoves: ICircle[];
     moveCount: number;
+    moves: IMove[];
 }
 
 const boardCenter = 3;
@@ -30,6 +32,7 @@ export class GameState implements IGameState {
     greenPlayerState: IPlayerState;
     allowedMoves: ICircle[];
     moveCount: number;
+    moves: IMove[] = [];
 
     constructor(redPlayerType: PlayerType, greenPlayerType: PlayerType) {
         this.redPlayerState = new PlayerState(Color.RED, redPlayerType);
