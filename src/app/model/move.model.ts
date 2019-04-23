@@ -26,5 +26,5 @@ export class ShiftMove implements IMove {
 }
 
 function getStringCoords(x: number, y: number): string {
-    return String.fromCharCode('A'.charCodeAt(0) + y) + x;
+    return String.fromCharCode('A'.charCodeAt(0) + x) + y;
 }

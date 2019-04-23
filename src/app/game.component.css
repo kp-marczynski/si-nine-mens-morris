@@ -46,3 +46,7 @@ th {
     /*text-align: center;*/
     /*display: inline-block;*/
 /*}*/
+
+mat-button-toggle {
+    width: 100px;
+}

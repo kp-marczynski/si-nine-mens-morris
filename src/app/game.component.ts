@@ -164,8 +164,8 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.canvasService.drawLine(3, 4, 3, 6);
         const legendOffset = 0.15;
         for (let i = 0; i < this.boardSize; ++i) {
-            this.canvasService.writeOnCanvas(this.offset / 4, this.offset * (1 + legendOffset) + i * this.baseSize, String.fromCharCode('A'.charCodeAt(0) + i));
-            this.canvasService.writeOnCanvas(this.offset * (1 - legendOffset) + i * this.baseSize, this.offset / 2, i.toString());
+            this.canvasService.writeOnCanvas(this.offset / 4, this.offset * (1 + legendOffset) + i * this.baseSize, i.toString());
+            this.canvasService.writeOnCanvas(this.offset * (1 - legendOffset) + i * this.baseSize, this.offset / 2, String.fromCharCode('A'.charCodeAt(0) + i));
         }
 
         this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;

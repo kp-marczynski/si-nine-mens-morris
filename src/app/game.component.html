@@ -30,19 +30,19 @@
                 <th>{{gameState.redPlayerState.color}}</th>
                 <th>{{gameState.greenPlayerState.color}}</th>
             </tr>
-            <tr>
-                <th>Player type:</th>
-                <td>
-                    <button mat-button (click)="changePlayerType('RED')">
-                        {{redPlayerType}}
-                    </button>
-                </td>
-                <td>
-                    <button mat-button (click)="changePlayerType('GREEN')">
-                        {{greenPlayerType}}
-                    </button>
-                </td>
-            </tr>
+            <!--<tr>-->
+                <!--<th>Player type:</th>-->
+                <!--<td>-->
+                    <!--<button mat-button (click)="changePlayerType('RED',group.value)">-->
+                        <!--{{redPlayerType}}-->
+                    <!--</button>-->
+                <!--</td>-->
+                <!--<td>-->
+                    <!--<button mat-button (click)="changePlayerType('GREEN',group.value)">-->
+                        <!--{{greenPlayerType}}-->
+                    <!--</button>-->
+                <!--</td>-->
+            <!--</tr>-->
             <tr>
                 <th>Points:</th>
                 <td>{{gameState.redPlayerState.points}}</td>
@@ -59,6 +59,67 @@
                 <td>{{gameState.greenPlayerState.piecesOnBoard}}</td>
             </tr>
         </table>
+    </mat-card>
+    <mat-card class="score-board">
+        <!--<mat-card-header>-->
+            <!--<h1>Settings</h1>-->
+        <!--</mat-card-header>-->
+        <mat-card-content>
+            <table>
+                <tr>
+                    <th>Red player</th>
+                    <td>
+                        <mat-button-toggle-group [value]="redPlayerType" (change)="changePlayerType('RED')">
+                            <mat-button-toggle value="HUMAN">
+                                HUMAN
+                            </mat-button-toggle>
+                            <mat-button-toggle value="COMPUTER">
+                                COMPUTER
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Green player</th>
+                    <td>
+                        <mat-button-toggle-group [value]="greenPlayerType" (change)="changePlayerType('GREEN')">
+                            <mat-button-toggle value="HUMAN">
+                                HUMAN
+                            </mat-button-toggle>
+                            <mat-button-toggle value="COMPUTER">
+                                COMPUTER
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Solving algorithm</th>
+                    <td>
+                        <mat-button-toggle-group value="minimax">
+                            <mat-button-toggle value="minimax">
+                                MINI-MAX
+                            </mat-button-toggle>
+                            <mat-button-toggle value="alpha-beta" disabled>
+                                ALPHA-BETA
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Heuristic</th>
+                    <td>
+                        <mat-button-toggle-group value="naive">
+                            <mat-button-toggle value="naive">
+                                NAIVE
+                            </mat-button-toggle>
+                            <mat-button-toggle value="other" disabled>
+                                OTHER
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </td>
+                </tr>
+            </table>
+        </mat-card-content>
     </mat-card>
     <mat-card class="score-board" *ngIf="gameState.moves.length != 0">
         <mat-card-header>
