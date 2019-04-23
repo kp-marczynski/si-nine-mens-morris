@@ -34,6 +34,12 @@ export class CanvasService {
         this.drawBasicCircleInCoords(x, y, circle.radius, circle.color);
     }
 
+    public writeOnCanvas(x: number, y: number, text: string) {
+        this.ctx.font = "30px Roboto";
+        this.ctx.fillStyle = "black";
+        this.ctx.fillText(text, x, y);
+    }
+
     public drawBasicCircleInCoords(x: number, y: number, radius: number, color: Color) {
         this.ctx.beginPath();
         const finalX = this.getRealCoordinate(x);

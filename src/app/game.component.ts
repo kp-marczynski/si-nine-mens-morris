@@ -19,7 +19,7 @@ import {MatSnackBar} from "@angular/material";
 })
 export class GameComponent implements AfterViewInit, OnInit {
 
-
+    boardSize: number = 7;
     baseSize: number;
     offset: number;
 
@@ -58,7 +58,7 @@ export class GameComponent implements AfterViewInit, OnInit {
         }
 
         this.baseSize = this.canvas.width / 8;
-        this.offset = this.baseSize;
+        this.offset = this.baseSize * 1.25;
         const baseRadiusSize = this.baseSize / 6;
 
         this.canvasService = new CanvasService(this.canvas, this.baseSize, this.offset, baseRadiusSize);
@@ -162,6 +162,11 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.canvasService.drawLine(4, 3, 6, 3);
         this.canvasService.drawLine(3, 0, 3, 2);
         this.canvasService.drawLine(3, 4, 3, 6);
+        const legendOffset = 0.15;
+        for (let i = 0; i < this.boardSize; ++i) {
+            this.canvasService.writeOnCanvas(this.offset / 4, this.offset * (1 + legendOffset) + i * this.baseSize, String.fromCharCode('A'.charCodeAt(0) + i));
+            this.canvasService.writeOnCanvas(this.offset * (1 - legendOffset) + i * this.baseSize, this.offset / 2, i.toString());
+        }
 
         this.redDrawerService.numberOfPieces = gameState.redPlayerState.piecesInDrawer;
         this.greenDrawerService.numberOfPieces = gameState.greenPlayerState.piecesInDrawer;
