@@ -79,7 +79,6 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.addCanvasOnClickListener();
         this.addCanvasOnMouseMoveListener();
         this.addCanvasOnTouchListener();
-        this.addCanvasComputerMoveListener();
     }
 
     addCanvasOnTouchListener(): void {
@@ -140,11 +139,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                     this.canvas.style.cursor = 'default';
                 }
             }
-        });
-    }
-
-    addCanvasComputerMoveListener(): void {
-        this.canvas.addEventListener('computer-move', () => this.performComputerMove(this.gameState));
+        }, {passive: true});
     }
 
     processMoveResult(gameState: IGameState): void {
@@ -152,16 +147,9 @@ export class GameComponent implements AfterViewInit, OnInit {
         if (gameState.moveType == MoveType.END_GAME) {
             console.log(gameState);
             // alert("Player " + gameState.turn + " has lost");
-        } else {
-            if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
-                // setTimeout(() => this.performComputerMove(gameState));
-                setTimeout(this.dispatchComputerMoveEvent, 0);
-            }
+        } else if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
+            this.performComputerMove();
         }
-    }
-
-    dispatchComputerMoveEvent() {
-        this.canvas.dispatchEvent(new Event('computer-move'));
     }
 
     drawBoard(gameState: IGameState): void {
@@ -182,22 +170,20 @@ export class GameComponent implements AfterViewInit, OnInit {
 
         this.redDrawerService.drawDrawer();
         this.greenDrawerService.drawDrawer();
-
-        // if (this.gameService.getCurrentPlayer(gameState).playerType == PlayerType.COMPUTER) {
-        //     setTimeout(() => this.performComputerMove(gameState));
-        // }
     }
 
-    performComputerMove(gameState: IGameState) {
-        let state = this.aiPlayerService.minimax(gameState);
-        if (state) {
-            this.gameState = state;
-            this.processMoveResult(this.gameState);
-        } else {
-            console.log("no moves");
-            console.log(gameState);
-            // alert("Player " + gameState.turn + " has lost");
-        }
+    performComputerMove() {
+        new Promise((resolve, reject) => setTimeout(() => {
+            let state = this.aiPlayerService.minimax(this.gameState);
+            if (state) {
+                this.gameState = state;
+            } else {
+                console.log("no moves");
+                console.log(this.gameState);
+            }
+            resolve();
+        }, 100)).then(() => this.processMoveResult(this.gameState));
+
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {
@@ -239,7 +225,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                 break;
         }
         if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
-            setTimeout(this.dispatchComputerMoveEvent, 0);
+            this.performComputerMove();
         }
     }
 }
