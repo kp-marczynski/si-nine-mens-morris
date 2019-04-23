@@ -203,7 +203,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                 message += '; ';
             }
         }
-        this.snackBar.open(message, 'OK', {duration: 10000});
+        this.snackBar.open(message, 'OK', {duration: 3000});
     }
 
     findIntersectingPiece(pieces: ICircle[], relativePosition: IPosition): ICircle {
