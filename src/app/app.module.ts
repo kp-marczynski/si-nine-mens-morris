@@ -12,6 +12,8 @@ import {MatListModule} from '@angular/material/list';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @NgModule({
     declarations: [
@@ -27,6 +29,8 @@ import {MatIconModule} from '@angular/material/icon';
         MatSnackBarModule,
         MatButtonToggleModule,
         MatIconModule,
+        MatProgressSpinnerModule,
+        BrowserAnimationsModule,
         ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
     ],
     providers: [],

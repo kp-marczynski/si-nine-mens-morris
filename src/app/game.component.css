@@ -50,3 +50,7 @@ th {
 mat-button-toggle, .table-button {
     width: 100px;
 }
+
+mat-spinner {
+    display: inline-block;
+}
