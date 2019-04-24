@@ -10,7 +10,8 @@ import {GameState, IGameState} from "./model/game-state.model";
 import {PlayerType} from "./model/enum/player-type.enum";
 import {GameService} from "./service/game.service";
 import {AiPlayerService} from "./service/ai-player.service";
-import {MatSnackBar} from "@angular/material";
+import {MatDialog, MatSnackBar} from "@angular/material";
+import {InfoComponent} from "./info/info.component";
 
 @Component({
     selector: 'app-root',
@@ -35,7 +36,9 @@ export class GameComponent implements AfterViewInit, OnInit {
     redPlayerType: PlayerType;
     greenPlayerType: PlayerType;
 
-    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar) {
+    defaultCanvasSize = 400;
+
+    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar, private dialog: MatDialog) {
         this.redPlayerType = PlayerType.HUMAN;
         this.greenPlayerType = PlayerType.HUMAN;
     }
@@ -54,8 +57,8 @@ export class GameComponent implements AfterViewInit, OnInit {
             this.canvas.width = 0.8 * getWinSize();
             this.canvas.height = 0.8 * getWinSize();
         } else {
-            this.canvas.width = 500;
-            this.canvas.height = 500;
+            this.canvas.width = this.defaultCanvasSize;
+            this.canvas.height = this.defaultCanvasSize;
         }
 
         this.baseSize = this.canvas.width / 8;
@@ -66,13 +69,13 @@ export class GameComponent implements AfterViewInit, OnInit {
 
         this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement,
             this.baseSize,
-            this.offset,
+            this.offset * 0.5,
             this.gameStates[this.currentIndex].redPlayerState.piecesInDrawer,
             Color.RED,
             2, baseRadiusSize);
         this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement,
             this.baseSize,
-            this.offset,
+            this.offset*0.5,
             this.gameStates[this.currentIndex].greenPlayerState.piecesInDrawer,
             Color.GREEN,
             2, baseRadiusSize);
@@ -273,6 +276,10 @@ export class GameComponent implements AfterViewInit, OnInit {
         if (this.getCurrentPlayerType(this.gameStates[this.currentIndex]) == PlayerType.COMPUTER) {
             this.performComputerMove();
         }
+    }
+
+    openInfoDialog(): void {
+        this.dialog.open(InfoComponent);
     }
 
 }

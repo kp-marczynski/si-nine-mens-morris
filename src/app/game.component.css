@@ -9,12 +9,12 @@ mat-card {
 
 .canvas-wrapper {
     margin: 2rem auto;
-    max-width: 500px;
+    max-width: 400px;
 }
 
-.game-wrapper {
+#game-wrapper {
     margin: auto;
-    max-width: 600px;
+    max-width: 450px;
 }
 
 canvas {

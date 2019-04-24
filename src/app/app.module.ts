@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {GameComponent} from './game.component';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule, NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {MatCardModule} from '@angular/material/card';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatButtonModule} from '@angular/material/button';
@@ -13,11 +13,16 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatDialogModule} from '@angular/material/dialog';
+import {InfoComponent} from './info/info.component';
 
 @NgModule({
     declarations: [
-        GameComponent
+        GameComponent,
+        InfoComponent
+    ],
+    entryComponents: [
+        InfoComponent
     ],
     imports: [
         BrowserModule,
@@ -31,6 +36,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
         MatIconModule,
         MatProgressSpinnerModule,
         BrowserAnimationsModule,
+        MatDialogModule,
         ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
     ],
     providers: [],

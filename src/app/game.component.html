@@ -9,9 +9,9 @@
             <mat-spinner [diameter]="32"></mat-spinner>
         </span>
     </h1>
-    <div class="game-wrapper">
+    <div id="game-wrapper">
         <mat-card class="canvas-wrapper" id="canvas-wrapper">
-            <canvas id="canvas" width="500" height="500">></canvas>
+            <canvas id="canvas" width="400" height="400">></canvas>
         </mat-card>
         <mat-grid-list cols="2">
             <mat-grid-tile>
@@ -26,6 +26,11 @@
             </mat-grid-tile>
         </mat-grid-list>
     </div>
+    <h1>
+        <button mat-stroked-button (click)="openInfoDialog()">
+            <mat-icon>help</mat-icon>
+        </button>
+    </h1>
     <mat-card class="score-board">
         <!--<mat-card-title>Stats:</mat-card-title>-->
         <table>
@@ -146,79 +151,6 @@
                 <mat-list-item
                         *ngFor="let move of gameStates[currentIndex].moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
             </mat-nav-list>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-header>
-            <h1>Rules of Nine Men's Morris</h1>
-        </mat-card-header>
-        <mat-card-content>
-            <h2>Objective</h2>
-            <ul>
-                <li>The final goal of the game is to leave the opponent only with 2 pieces, or to block all the opponent
-                    pieces, so that they may not be moved.
-                </li>
-                <li>The way of approaching to that objective is to build mills (3 pieces in an straight line), which
-                    gives the right to capture one opponent piece.
-                </li>
-            </ul>
-            <h2>Setup</h2>
-            <ul>
-                <li>The board consist of a grid with 24 fields connected vertically and horizontally.</li>
-                <li>There are 2 players: RED and GREEN.</li>
-                <li>Each player has 9 pieces.</li>
-                <li>RED player plays first.</li>
-            </ul>
-            <h2>Gameplay</h2>
-
-            <h3>Phase I: Placing pieces</h3>
-            <ul>
-                <li>Phase starts with empty board.</li>
-                <li>Players take turns to place one by one all their pieces on empty fields of the board.</li>
-                <li>During <em>Phase I</em> there is no option to move the pieces already placed on the board.</li>
-            </ul>
-
-            <h3>Phase II: Moving Pieces</h3>
-            <ul>
-                <li>Phase starts after placing all the pieces.</li>
-                <li>In every turn player is moving 1 of they own pieces through one of the lines to an empty adjacent
-                    field of the board.
-                </li>
-            </ul>
-
-            <h3>Phase III: Flying</h3>
-            <ul>
-                <li>Once a player has 3 pieces left, adjacent rule do not apply and a piece may instead be moved to any
-                    empty field on the board.
-                </li>
-            </ul>
-
-            <h2>Mill</h2>
-            <ul>
-                <li>Mills can be built during both phases of the game.</li>
-                <li>Mill happens when the 3 fields in one of the lines of the board are occupied by 3 pieces of the same
-                    colour
-                </li>
-                <li>The player who forms the mill must remove one of the opponent´s pieces from the board.</li>
-                <li>Removed piece can not be used again during the game.</li>
-                <li>The right to perform opponent's piece removal exists every time that the mill is built.</li>
-            </ul>
-
-            <h2>Additional rules</h2>
-            <ul>
-                <li>When player's piece was moved player can not move that piece to its previous position in next
-                    move.
-                </li>
-            </ul>
-
-            <h2>How to play</h2>
-            <ul>
-                <li>During <em>Phase I</em> click on empty field of the board to place new piece.</li>
-                <li>After forming mill click on opponent's piece placed on board to remove it.</li>
-                <li>During <em>Phase II</em> or <em>Phase III</em> click on your piece to select it and then click on
-                    one of the highlighted fields to move there selected piece.
-                </li>
-            </ul>
         </mat-card-content>
     </mat-card>
 </div>
