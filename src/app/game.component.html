@@ -26,131 +26,118 @@
             </mat-grid-tile>
         </mat-grid-list>
     </div>
-    <h1>
-        <button mat-stroked-button (click)="openInfoDialog()">
-            <mat-icon>help</mat-icon>
-        </button>
-    </h1>
-    <mat-card class="score-board">
-        <!--<mat-card-title>Stats:</mat-card-title>-->
-        <table>
-            <tr class="header-row">
-                <th></th>
-                <th>{{gameStates[currentIndex].redPlayerState.color}}</th>
-                <th>{{gameStates[currentIndex].greenPlayerState.color}}</th>
-            </tr>
-            <!--<tr>-->
-            <!--<th>Player type:</th>-->
-            <!--<td>-->
-            <!--<button mat-button (click)="changePlayerType('RED',group.value)">-->
-            <!--{{redPlayerType}}-->
-            <!--</button>-->
-            <!--</td>-->
-            <!--<td>-->
-            <!--<button mat-button (click)="changePlayerType('GREEN',group.value)">-->
-            <!--{{greenPlayerType}}-->
-            <!--</button>-->
-            <!--</td>-->
-            <!--</tr>-->
-            <tr>
-                <th>Points:</th>
-                <td>{{gameStates[currentIndex].redPlayerState.points}}</td>
-                <td>{{gameStates[currentIndex].greenPlayerState.points}}</td>
-            </tr>
-            <tr>
-                <th>Pieces in drawer:</th>
-                <td>{{gameStates[currentIndex].redPlayerState.piecesInDrawer}}</td>
-                <td>{{gameStates[currentIndex].greenPlayerState.piecesInDrawer}}</td>
-            </tr>
-            <tr>
-                <th>Pieces on board:</th>
-                <td>{{gameStates[currentIndex].redPlayerState.piecesOnBoard}}</td>
-                <td>{{gameStates[currentIndex].greenPlayerState.piecesOnBoard}}</td>
-            </tr>
-        </table>
-    </mat-card>
-    <mat-card class="score-board">
-        <!--<mat-card-header>-->
-        <!--<h1>Settings</h1>-->
-        <!--</mat-card-header>-->
-        <mat-card-content>
+    <div>
+        <h1>
+            <button mat-stroked-button (click)="openInfoDialog()">
+                <mat-icon>help</mat-icon>
+            </button>
+        </h1>
+        <mat-card class="score-board">
             <table>
-                <tr>
-                    <th>Red player</th>
-                    <td>
-                        <mat-button-toggle-group [value]="redPlayerType" (change)="changePlayerType('RED')">
-                            <mat-button-toggle value="HUMAN">
-                                HUMAN
-                            </mat-button-toggle>
-                            <mat-button-toggle value="COMPUTER">
-                                COMPUTER
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
+                <tr class="header-row">
+                    <th></th>
+                    <th>{{gameStates[currentIndex].redPlayerState.color}}</th>
+                    <th>{{gameStates[currentIndex].greenPlayerState.color}}</th>
                 </tr>
                 <tr>
-                    <th>Green player</th>
-                    <td>
-                        <mat-button-toggle-group [value]="greenPlayerType" (change)="changePlayerType('GREEN')">
-                            <mat-button-toggle value="HUMAN">
-                                HUMAN
-                            </mat-button-toggle>
-                            <mat-button-toggle value="COMPUTER">
-                                COMPUTER
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
+                    <th>Points:</th>
+                    <td>{{gameStates[currentIndex].redPlayerState.points}}</td>
+                    <td>{{gameStates[currentIndex].greenPlayerState.points}}</td>
                 </tr>
                 <tr>
-                    <th>Solving algorithm</th>
-                    <td>
-                        <mat-button-toggle-group value="minimax">
-                            <mat-button-toggle value="minimax">
-                                MINI-MAX
-                            </mat-button-toggle>
-                            <mat-button-toggle value="alpha-beta" disabled>
-                                ALPHA-BETA
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
+                    <th>Pieces in drawer:</th>
+                    <td>{{gameStates[currentIndex].redPlayerState.piecesInDrawer}}</td>
+                    <td>{{gameStates[currentIndex].greenPlayerState.piecesInDrawer}}</td>
                 </tr>
                 <tr>
-                    <th>Heuristic</th>
-                    <td>
-                        <mat-button-toggle-group value="naive">
-                            <mat-button-toggle value="naive">
-                                NAIVE
-                            </mat-button-toggle>
-                            <mat-button-toggle value="other" disabled>
-                                OTHER
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Turn</th>
-                    <td>
-                        <button mat-stroked-button class="table-button" [disabled]="currentIndex==0" (click)="undo()">
-                            <mat-icon>undo</mat-icon>
-                        </button>
-                        <button mat-stroked-button class="table-button" [disabled]="currentIndex==gameStates.length-1"
-                                (click)="redo()">
-                            <mat-icon>redo</mat-icon>
-                        </button>
-                    </td>
+                    <th>Pieces on board:</th>
+                    <td>{{gameStates[currentIndex].redPlayerState.piecesOnBoard}}</td>
+                    <td>{{gameStates[currentIndex].greenPlayerState.piecesOnBoard}}</td>
                 </tr>
             </table>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="score-board" *ngIf="gameStates[currentIndex].moves.length != 0">
-        <mat-card-header>
-            <h1>Moves</h1>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-nav-list>
-                <mat-list-item
-                        *ngFor="let move of gameStates[currentIndex].moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
-            </mat-nav-list>
-        </mat-card-content>
-    </mat-card>
+        </mat-card>
+        <mat-card class="score-board">
+            <mat-card-content>
+                <table>
+                    <tr>
+                        <th>Red player</th>
+                        <td>
+                            <mat-button-toggle-group [value]="redPlayerType" (change)="changePlayerType('RED')">
+                                <mat-button-toggle value="HUMAN">
+                                    HUMAN
+                                </mat-button-toggle>
+                                <mat-button-toggle value="COMPUTER">
+                                    COMPUTER
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Green player</th>
+                        <td>
+                            <mat-button-toggle-group [value]="greenPlayerType" (change)="changePlayerType('GREEN')">
+                                <mat-button-toggle value="HUMAN">
+                                    HUMAN
+                                </mat-button-toggle>
+                                <mat-button-toggle value="COMPUTER">
+                                    COMPUTER
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Solving algorithm</th>
+                        <td>
+                            <mat-button-toggle-group value="minimax">
+                                <mat-button-toggle value="minimax">
+                                    MINI-MAX
+                                </mat-button-toggle>
+                                <mat-button-toggle value="alpha-beta" disabled>
+                                    ALPHA-BETA
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Heuristic</th>
+                        <td>
+                            <mat-button-toggle-group value="naive">
+                                <mat-button-toggle value="naive">
+                                    NAIVE
+                                </mat-button-toggle>
+                                <mat-button-toggle value="other" disabled>
+                                    OTHER
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Turn</th>
+                        <td>
+                            <button mat-stroked-button class="table-button" [disabled]="currentIndex==0"
+                                    (click)="undo()">
+                                <mat-icon>undo</mat-icon>
+                            </button>
+                            <button mat-stroked-button class="table-button"
+                                    [disabled]="currentIndex==gameStates.length-1"
+                                    (click)="redo()">
+                                <mat-icon>redo</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </mat-card-content>
+        </mat-card>
+        <mat-card class="score-board" *ngIf="gameStates[currentIndex].moves.length != 0">
+            <mat-card-header>
+                <h1>Moves</h1>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-nav-list>
+                    <mat-list-item
+                            *ngFor="let move of gameStates[currentIndex].moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
+                </mat-nav-list>
+            </mat-card-content>
+        </mat-card>
+    </div>
 </div>
