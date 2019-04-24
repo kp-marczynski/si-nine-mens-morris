@@ -1,12 +1,10 @@
 <div *ngIf="gameStates[currentIndex]">
     <h1>
-        <button mat-button  [disabled]="currentIndex==0" (click)="undo()"><mat-icon>undo</mat-icon></button>
         <span class="header-wrapper">{{gameStates[currentIndex].moveCount + 1}}</span>
         <span> : </span>
         <span class="header-wrapper">{{gameStates[currentIndex].turn}}</span>
         <span> : </span>
         <span class="header-wrapper">{{gameStates[currentIndex].moveType}}</span>
-        <button mat-button  [disabled]="currentIndex==gameStates.length-1" (click)="redo()"><mat-icon>redo</mat-icon></button>
     </h1>
     <div class="game-wrapper">
         <mat-card class="canvas-wrapper" id="canvas-wrapper">
@@ -119,6 +117,13 @@
                                 OTHER
                             </mat-button-toggle>
                         </mat-button-toggle-group>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Turn</th>
+                    <td>
+                        <button mat-stroked-button class="table-button" [disabled]="currentIndex==0" (click)="undo()"><mat-icon>undo</mat-icon></button>
+                        <button mat-stroked-button class="table-button" [disabled]="currentIndex==gameStates.length-1" (click)="redo()"><mat-icon>redo</mat-icon></button>
                     </td>
                 </tr>
             </table>

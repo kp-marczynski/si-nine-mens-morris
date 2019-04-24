@@ -47,6 +47,6 @@ th {
     /*display: inline-block;*/
 /*}*/
 
-mat-button-toggle {
+mat-button-toggle, .table-button {
     width: 100px;
 }
