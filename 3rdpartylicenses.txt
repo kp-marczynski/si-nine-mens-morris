@@ -95,6 +95,8 @@ THE SOFTWARE.
 
 @angular/material/grid-list
 
+@angular/material/icon
+
 @angular/material/list
 
 @angular/material/snack-bar
