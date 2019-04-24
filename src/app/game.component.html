@@ -1,9 +1,12 @@
-<div *ngIf="gameState">
-    <h1><span class="header-wrapper">{{gameState.moveCount + 1}}</span>
+<div *ngIf="gameStates[currentIndex]">
+    <h1>
+        <button mat-button  [disabled]="currentIndex==0" (click)="undo()"><mat-icon>undo</mat-icon></button>
+        <span class="header-wrapper">{{gameStates[currentIndex].moveCount + 1}}</span>
         <span> : </span>
-        <span class="header-wrapper">{{gameState.turn}}</span>
+        <span class="header-wrapper">{{gameStates[currentIndex].turn}}</span>
         <span> : </span>
-        <span class="header-wrapper">{{gameState.moveType}}</span>
+        <span class="header-wrapper">{{gameStates[currentIndex].moveType}}</span>
+        <button mat-button  [disabled]="currentIndex==gameStates.length-1" (click)="redo()"><mat-icon>redo</mat-icon></button>
     </h1>
     <div class="game-wrapper">
         <mat-card class="canvas-wrapper" id="canvas-wrapper">
@@ -27,8 +30,8 @@
         <table>
             <tr class="header-row">
                 <th></th>
-                <th>{{gameState.redPlayerState.color}}</th>
-                <th>{{gameState.greenPlayerState.color}}</th>
+                <th>{{gameStates[currentIndex].redPlayerState.color}}</th>
+                <th>{{gameStates[currentIndex].greenPlayerState.color}}</th>
             </tr>
             <!--<tr>-->
                 <!--<th>Player type:</th>-->
@@ -45,18 +48,18 @@
             <!--</tr>-->
             <tr>
                 <th>Points:</th>
-                <td>{{gameState.redPlayerState.points}}</td>
-                <td>{{gameState.greenPlayerState.points}}</td>
+                <td>{{gameStates[currentIndex].redPlayerState.points}}</td>
+                <td>{{gameStates[currentIndex].greenPlayerState.points}}</td>
             </tr>
             <tr>
                 <th>Pieces in drawer:</th>
-                <td>{{gameState.redPlayerState.piecesInDrawer}}</td>
-                <td>{{gameState.greenPlayerState.piecesInDrawer}}</td>
+                <td>{{gameStates[currentIndex].redPlayerState.piecesInDrawer}}</td>
+                <td>{{gameStates[currentIndex].greenPlayerState.piecesInDrawer}}</td>
             </tr>
             <tr>
                 <th>Pieces on board:</th>
-                <td>{{gameState.redPlayerState.piecesOnBoard}}</td>
-                <td>{{gameState.greenPlayerState.piecesOnBoard}}</td>
+                <td>{{gameStates[currentIndex].redPlayerState.piecesOnBoard}}</td>
+                <td>{{gameStates[currentIndex].greenPlayerState.piecesOnBoard}}</td>
             </tr>
         </table>
     </mat-card>
@@ -121,14 +124,14 @@
             </table>
         </mat-card-content>
     </mat-card>
-    <mat-card class="score-board" *ngIf="gameState.moves.length != 0">
+    <mat-card class="score-board" *ngIf="gameStates[currentIndex].moves.length != 0">
         <mat-card-header>
             <h1>Moves</h1>
         </mat-card-header>
         <mat-card-content>
             <mat-nav-list>
                 <mat-list-item
-                        *ngFor="let move of gameState.moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
+                        *ngFor="let move of gameStates[currentIndex].moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
             </mat-nav-list>
         </mat-card-content>
     </mat-card>

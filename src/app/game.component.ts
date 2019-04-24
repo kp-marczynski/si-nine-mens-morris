@@ -29,7 +29,8 @@ export class GameComponent implements AfterViewInit, OnInit {
     redDrawerService: DrawerService;
     greenDrawerService: DrawerService;
 
-    gameState: IGameState = null;
+    gameStates: IGameState[] = [];
+    currentIndex = 0;
 
     redPlayerType: PlayerType;
     greenPlayerType: PlayerType;
@@ -40,11 +41,11 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     ngOnInit(): void {
-        this.gameState = new GameState(PlayerType.HUMAN, PlayerType.HUMAN);
+        this.gameStates.push(new GameState(PlayerType.HUMAN, PlayerType.HUMAN));
     }
 
     ngAfterViewInit(): void {
-        setTimeout(() => this.afterViewInitCallback(), 0);
+        setTimeout(() => this.afterViewInitCallback());
     }
 
     afterViewInitCallback(): void {
@@ -66,17 +67,17 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.redDrawerService = new DrawerService(document.getElementById('red-drawer') as HTMLCanvasElement,
             this.baseSize,
             this.offset,
-            this.gameState.redPlayerState.piecesInDrawer,
+            this.gameStates[this.currentIndex].redPlayerState.piecesInDrawer,
             Color.RED,
             2, baseRadiusSize);
         this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement,
             this.baseSize,
             this.offset,
-            this.gameState.greenPlayerState.piecesInDrawer,
+            this.gameStates[this.currentIndex].greenPlayerState.piecesInDrawer,
             Color.GREEN,
             2, baseRadiusSize);
 
-        this.drawBoard(this.gameState);
+        this.drawBoard(this.gameStates[this.currentIndex]);
         this.addCanvasOnClickListener();
         this.addCanvasOnMouseMoveListener();
         this.addCanvasOnTouchListener();
@@ -92,12 +93,14 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     onClickOrTouchListener(event: UIEvent) {
         event.preventDefault();
-        if (this.getCurrentPlayerType(this.gameState) == PlayerType.HUMAN) {
+        if (this.getCurrentPlayerType(this.gameStates[this.gameStates.length - 1]) == PlayerType.HUMAN) {
             const relativePosition = this.canvasService.getPositionInCanvas(event);
-            const selectedCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
+            const selectedCircle: ICircle = this.findIntersectingPiece(this.gameStates[this.gameStates.length - 1].circles, relativePosition);
             if (selectedCircle) {
-                this.gameService.performMove(this.gameState, selectedCircle);
-                this.processMoveResult(this.gameState);
+                let newGameState = this.gameService.clone(this.gameStates[this.currentIndex]);
+                let circle = newGameState.circles.find(circle => circle.x == selectedCircle.x && circle.y == selectedCircle.y);
+                this.gameService.performMove(newGameState, circle);
+                this.processMoveResult(newGameState);
             }
         }
     }
@@ -113,23 +116,23 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     addCanvasOnMouseMoveListener(): void {
         this.canvas.addEventListener('mousemove', (mouseEvent) => {
-            if (this.getCurrentPlayerType(this.gameState) == PlayerType.HUMAN) {
+            if (this.getCurrentPlayerType(this.gameStates[this.currentIndex]) == PlayerType.HUMAN) {
                 const relativePosition = this.canvasService.getMousePositionInCanvas(mouseEvent);
-                const hoveredCircle: ICircle = this.findIntersectingPiece(this.gameState.circles, relativePosition);
+                const hoveredCircle: ICircle = this.findIntersectingPiece(this.gameStates[this.currentIndex].circles, relativePosition);
                 let isMoveAllowed = false;
 
                 if (hoveredCircle) {
-                    switch (this.gameState.moveType) {
+                    switch (this.gameStates[this.currentIndex].moveType) {
                         case MoveType.NORMAL:
                         case MoveType.REMOVE_OPPONENT:
                         case MoveType.REMOVE_OPPONENT_2:
-                            isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
+                            isMoveAllowed = this.gameService.isMoveAllowed(this.gameStates[this.currentIndex], hoveredCircle);
                             break;
                         case MoveType.MOVE_NEARBY:
                         case MoveType.MOVE_ANYWHERE:
-                            isMoveAllowed = this.gameService.isMoveAllowed(this.gameState, hoveredCircle);
-                            if (!isMoveAllowed && this.gameState.chosenForShift != null) {
-                                isMoveAllowed = this.gameService.isShiftToAllowed(this.gameState, this.gameState.chosenForShift, hoveredCircle);
+                            isMoveAllowed = this.gameService.isMoveAllowed(this.gameStates[this.currentIndex], hoveredCircle);
+                            if (!isMoveAllowed && this.gameStates[this.currentIndex].chosenForShift != null) {
+                                isMoveAllowed = this.gameService.isShiftToAllowed(this.gameStates[this.currentIndex], this.gameStates[this.currentIndex].chosenForShift, hoveredCircle);
                             }
                             break;
                     }
@@ -144,12 +147,17 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     processMoveResult(gameState: IGameState): void {
-        this.drawBoard(gameState);
-        if (gameState.moveType == MoveType.END_GAME) {
-            console.log(gameState);
-            // alert("Player " + gameState.turn + " has lost");
-        } else if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
-            this.performComputerMove();
+        if (gameState != null) {
+            this.gameStates = this.gameStates.slice(0, this.currentIndex + 1);
+            this.gameStates.push(gameState);
+            this.currentIndex++;
+            this.drawBoard(this.gameStates[this.currentIndex]);
+            if (gameState.moveType == MoveType.END_GAME) {
+                console.log(gameState);
+                // alert("Player " + gameState.turn + " has lost");
+            } else if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
+                this.performComputerMove();
+            }
         }
     }
 
@@ -179,17 +187,18 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     performComputerMove() {
+        let state: IGameState = null;
         new Promise((resolve, reject) => setTimeout(() => {
-            let state = this.aiPlayerService.minimax(this.gameState);
+            state = this.aiPlayerService.minimax(this.gameStates[this.currentIndex]);
             if (state) {
-                this.gameState = state;
+                // this.gameState = state;
                 this.showSnackBarWithMoveResult(state);
             } else {
                 console.log("no moves");
-                console.log(this.gameState);
+                // console.log(this.gameState);
             }
             resolve();
-        }, 100)).then(() => this.processMoveResult(this.gameState));
+        }, 100)).then(() => this.processMoveResult(state));
 
     }
 
@@ -244,8 +253,26 @@ export class GameComponent implements AfterViewInit, OnInit {
                 this.greenPlayerType = result;
                 break;
         }
-        if (this.getCurrentPlayerType(this.gameState) == PlayerType.COMPUTER) {
+        if (this.getCurrentPlayerType(this.gameStates[this.currentIndex]) == PlayerType.COMPUTER) {
             this.performComputerMove();
         }
     }
+
+    undo() {
+        this.currentIndex--;
+        this.updateState();
+    }
+
+    redo() {
+        this.currentIndex++;
+        this.updateState();
+    }
+
+    updateState() {
+        this.drawBoard(this.gameStates[this.currentIndex]);
+        if (this.getCurrentPlayerType(this.gameStates[this.currentIndex]) == PlayerType.COMPUTER) {
+            this.performComputerMove();
+        }
+    }
+
 }

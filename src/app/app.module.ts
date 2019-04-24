@@ -11,6 +11,7 @@ import {environment} from '../environments/environment';
 import {MatListModule} from '@angular/material/list';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
     declarations: [
@@ -25,6 +26,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
         MatListModule,
         MatSnackBarModule,
         MatButtonToggleModule,
+        MatIconModule,
         ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
     ],
     providers: [],
