@@ -3,7 +3,7 @@ mat-card {
 }
 
 .score-board {
-    width: 300px;
+    max-width: 300px;
     margin: 2rem auto;
 }
 
@@ -12,7 +12,7 @@ mat-card {
     max-width: 400px;
 }
 
-#game-wrapper {
+.game-wrapper {
     margin: auto;
     max-width: 450px;
 }
@@ -50,7 +50,7 @@ th {
 /*}*/
 
 mat-button-toggle, .table-button {
-    width: 100px;
+    width: 95px;
 }
 
 mat-spinner {
@@ -77,4 +77,11 @@ mat-spinner {
 .icon-button {
     padding: 0;
     width: 2rem;
+}
+
+mat-toolbar {
+    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10000;
 }

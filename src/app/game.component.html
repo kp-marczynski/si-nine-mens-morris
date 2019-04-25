@@ -1,12 +1,82 @@
 <div *ngIf="gameStates[currentIndex]">
-    <div id="game-wrapper">
-        <div class="buttons-wrapper">
+    <mat-toolbar color="primary">
+        <div class="game-wrapper">
             <button mat-icon-button class="float-left" (click)="reset()">
                 <mat-icon>replay</mat-icon>
             </button>
             <button mat-icon-button class="float-right" (click)="openInfoDialog()">
                 <mat-icon>help</mat-icon>
             </button>
+            <button mat-icon-button [disabled]="currentIndex==0"
+                    (click)="undo()">
+                <mat-icon>undo</mat-icon>
+            </button>
+            <button mat-button [matMenuTriggerFor]="menu">Settings</button>
+            <mat-menu #menu="matMenu">
+                <table>
+                    <tr>
+                        <th>Red player</th>
+                        <td>
+                            <mat-button-toggle-group [value]="redPlayerType" (change)="changePlayerType('RED')">
+                                <mat-button-toggle value="HUMAN">
+                                    HUMAN
+                                </mat-button-toggle>
+                                <mat-button-toggle value="AI">
+                                    AI
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Green player</th>
+                        <td>
+                            <mat-button-toggle-group [value]="greenPlayerType" (change)="changePlayerType('GREEN')">
+                                <mat-button-toggle value="HUMAN">
+                                    HUMAN
+                                </mat-button-toggle>
+                                <mat-button-toggle value="AI">
+                                    AI
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Solving algorithm</th>
+                        <td>
+                            <mat-button-toggle-group value="minimax">
+                                <mat-button-toggle value="minimax">
+                                    MINI-MAX
+                                </mat-button-toggle>
+                                <mat-button-toggle value="alpha-beta" disabled>
+                                    &alpha;-&beta;
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Heuristic</th>
+                        <td>
+                            <mat-button-toggle-group value="naive">
+                                <mat-button-toggle value="naive">
+                                    NAIVE
+                                </mat-button-toggle>
+                                <mat-button-toggle value="other" disabled>
+                                    OTHER
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                </table>
+            </mat-menu>
+            <button mat-icon-button
+                    [disabled]="currentIndex==gameStates.length-1"
+                    (click)="redo()">
+                <mat-icon>redo</mat-icon>
+            </button>
+        </div>
+    </mat-toolbar>
+    <div class="game-wrapper">
+        <div class="buttons-wrapper">
             <h1>
                 <span class="header-wrapper">{{gameStates[currentIndex].moveCount + 1}}</span>
                 <span> : </span>
@@ -62,81 +132,6 @@
                 </tr>
             </table>
         </mat-card>
-        <mat-expansion-panel class="score-board">
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Settings
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <table>
-                <tr>
-                    <th>Red player</th>
-                    <td>
-                        <mat-button-toggle-group [value]="redPlayerType" (change)="changePlayerType('RED')">
-                            <mat-button-toggle value="HUMAN">
-                                HUMAN
-                            </mat-button-toggle>
-                            <mat-button-toggle value="COMPUTER">
-                                COMPUTER
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Green player</th>
-                    <td>
-                        <mat-button-toggle-group [value]="greenPlayerType" (change)="changePlayerType('GREEN')">
-                            <mat-button-toggle value="HUMAN">
-                                HUMAN
-                            </mat-button-toggle>
-                            <mat-button-toggle value="COMPUTER">
-                                COMPUTER
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Solving algorithm</th>
-                    <td>
-                        <mat-button-toggle-group value="minimax">
-                            <mat-button-toggle value="minimax">
-                                MINI-MAX
-                            </mat-button-toggle>
-                            <mat-button-toggle value="alpha-beta" disabled>
-                                ALPHA-BETA
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Heuristic</th>
-                    <td>
-                        <mat-button-toggle-group value="naive">
-                            <mat-button-toggle value="naive">
-                                NAIVE
-                            </mat-button-toggle>
-                            <mat-button-toggle value="other" disabled>
-                                OTHER
-                            </mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Turn</th>
-                    <td>
-                        <button mat-stroked-button class="table-button" [disabled]="currentIndex==0"
-                                (click)="undo()">
-                            <mat-icon>undo</mat-icon>
-                        </button>
-                        <button mat-stroked-button class="table-button"
-                                [disabled]="currentIndex==gameStates.length-1"
-                                (click)="redo()">
-                            <mat-icon>redo</mat-icon>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </mat-expansion-panel>
         <mat-expansion-panel class="score-board" *ngIf="gameStates[currentIndex].moves.length != 0">
             <mat-expansion-panel-header>
                 <mat-panel-title>
