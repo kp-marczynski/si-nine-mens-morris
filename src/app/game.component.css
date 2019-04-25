@@ -24,8 +24,10 @@ canvas {
 }
 
 h1 {
+    margin: auto;
     position: center;
     text-align: center;
+    max-width: 80%;
 }
 
 td {
@@ -42,9 +44,9 @@ th {
 }
 
 /*.header-wrapper {*/
-    /*min-width: 100px;*/
-    /*text-align: center;*/
-    /*display: inline-block;*/
+/*min-width: 100px;*/
+/*text-align: center;*/
+/*display: inline-block;*/
 /*}*/
 
 mat-button-toggle, .table-button {
@@ -53,4 +55,26 @@ mat-button-toggle, .table-button {
 
 mat-spinner {
     display: inline-block;
+}
+
+/*.center {*/
+/*margin: auto;*/
+/*display: block;*/
+/*}*/
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.player-name {
+    width: 100px;
+    display: inline-block;
+}
+
+.icon-button {
+    padding: 0;
+    width: 2rem;
 }

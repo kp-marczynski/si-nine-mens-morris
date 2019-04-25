@@ -89,11 +89,6 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.drawBoard(this.gameStates[this.currentIndex]);
         this.addCanvasOnClickListener();
         this.addCanvasOnMouseMoveListener();
-        this.addCanvasOnTouchListener();
-    }
-
-    addCanvasOnTouchListener(): void {
-        // this.canvas.addEventListener('touchstart', (touchEvent) => this.onClickOrTouchListener(touchEvent));
     }
 
     addCanvasOnClickListener(): void {
@@ -101,7 +96,6 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     onClickOrTouchListener(event: UIEvent) {
-        // event.preventDefault();
         if (this.getCurrentPlayerType(this.gameStates[this.gameStates.length - 1]) == PlayerType.HUMAN) {
             const relativePosition = this.canvasService.getPositionInCanvas(event);
             const selectedCircle: ICircle = this.findIntersectingPiece(this.gameStates[this.gameStates.length - 1].circles, relativePosition);
