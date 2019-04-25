@@ -4,8 +4,8 @@
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
-  "scope": "http://kp-marczynski.github.io/si-nine-mens-morris",
-  "start_url": "http://kp-marczynski.github.io/si-nine-mens-morris",
+  "scope": "https://kp-marczynski.github.io/si-nine-mens-morris",
+  "start_url": "https://kp-marczynski.github.io/si-nine-mens-morris",
   "icons": [
     {
       "src": "assets/icons/icon-72x72.png",
