@@ -1,20 +1,20 @@
 {
   "configVersion": 1,
-  "timestamp": 1556179188925,
-  "index": "./index.html",
+  "timestamp": 1556179437721,
+  "index": "http://kp-marczynski.github.io/si-nine-mens-morris/index.html",
   "assetGroups": [
     {
       "name": "app",
       "installMode": "prefetch",
       "updateMode": "prefetch",
       "urls": [
-        "./es2015-polyfills.1e04665e16f944715fd2.js",
-        "./favicon.ico",
-        "./index.html",
-        "./main.a3f40ff860f3994d7043.js",
-        "./polyfills.8bbb231b43165d65d357.js",
-        "./runtime.26209474bfa8dc87a77c.js",
-        "./styles.f66257e0a98d0d224378.css"
+        "http://kp-marczynski.github.io/si-nine-mens-morris/es2015-polyfills.1e04665e16f944715fd2.js",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/favicon.ico",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/index.html",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/main.a3f40ff860f3994d7043.js",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/polyfills.8bbb231b43165d65d357.js",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/runtime.26209474bfa8dc87a77c.js",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/styles.f66257e0a98d0d224378.css"
       ],
       "patterns": []
     },
@@ -23,35 +23,35 @@
       "installMode": "lazy",
       "updateMode": "prefetch",
       "urls": [
-        "./assets/icons/icon-128x128.png",
-        "./assets/icons/icon-144x144.png",
-        "./assets/icons/icon-152x152.png",
-        "./assets/icons/icon-192x192.png",
-        "./assets/icons/icon-384x384.png",
-        "./assets/icons/icon-512x512.png",
-        "./assets/icons/icon-72x72.png",
-        "./assets/icons/icon-96x96.png"
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-128x128.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-144x144.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-152x152.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-192x192.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-384x384.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-512x512.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-72x72.png",
+        "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-96x96.png"
       ],
       "patterns": []
     }
   ],
   "dataGroups": [],
   "hashTable": {
-    "./assets/icons/icon-128x128.png": "dae3b6ed49bdaf4327b92531d4b5b4a5d30c7532",
-    "./assets/icons/icon-144x144.png": "b0bd89982e08f9bd2b642928f5391915b74799a7",
-    "./assets/icons/icon-152x152.png": "7479a9477815dfd9668d60f8b3b2fba709b91310",
-    "./assets/icons/icon-192x192.png": "1abd80d431a237a853ce38147d8c63752f10933b",
-    "./assets/icons/icon-384x384.png": "329749cd6393768d3131ed6304c136b1ca05f2fd",
-    "./assets/icons/icon-512x512.png": "559d9c4318b45a1f2b10596bbb4c960fe521dbcc",
-    "./assets/icons/icon-72x72.png": "c457e56089a36952cd67156f9996bc4ce54a5ed9",
-    "./assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
-    "./es2015-polyfills.1e04665e16f944715fd2.js": "b7a81c61d32b0b12737f0c13f45973ba391cd7f9",
-    "./favicon.ico": "84161b857f5c547e3699ddfbffc6d8d737542e01",
-    "./index.html": "6ee42fc9eefcf35a685b915acfef1a483f667546",
-    "./main.a3f40ff860f3994d7043.js": "d2d5fccc4a5b66d0adf688ee157de2694b5cd4db",
-    "./polyfills.8bbb231b43165d65d357.js": "ffa449995bf2eba2ccd0a002417214f7eb75e7b5",
-    "./runtime.26209474bfa8dc87a77c.js": "b62956c2192bfe5516d6374e753773901ed50ec5",
-    "./styles.f66257e0a98d0d224378.css": "4e86379b7e50cb2aec98afccb62be41de9fb6af6"
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-128x128.png": "dae3b6ed49bdaf4327b92531d4b5b4a5d30c7532",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-144x144.png": "b0bd89982e08f9bd2b642928f5391915b74799a7",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-152x152.png": "7479a9477815dfd9668d60f8b3b2fba709b91310",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-192x192.png": "1abd80d431a237a853ce38147d8c63752f10933b",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-384x384.png": "329749cd6393768d3131ed6304c136b1ca05f2fd",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-512x512.png": "559d9c4318b45a1f2b10596bbb4c960fe521dbcc",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-72x72.png": "c457e56089a36952cd67156f9996bc4ce54a5ed9",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/assets/icons/icon-96x96.png": "3914125a4b445bf111c5627875fc190f560daa41",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/es2015-polyfills.1e04665e16f944715fd2.js": "b7a81c61d32b0b12737f0c13f45973ba391cd7f9",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/favicon.ico": "84161b857f5c547e3699ddfbffc6d8d737542e01",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/index.html": "6f30144a65fb465abeb2538c8ad5cf78dc344ac0",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/main.a3f40ff860f3994d7043.js": "d2d5fccc4a5b66d0adf688ee157de2694b5cd4db",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/polyfills.8bbb231b43165d65d357.js": "ffa449995bf2eba2ccd0a002417214f7eb75e7b5",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/runtime.26209474bfa8dc87a77c.js": "b62956c2192bfe5516d6374e753773901ed50ec5",
+    "http://kp-marczynski.github.io/si-nine-mens-morris/styles.f66257e0a98d0d224378.css": "4e86379b7e50cb2aec98afccb62be41de9fb6af6"
   },
   "navigationUrls": [
     {
