@@ -4,7 +4,7 @@ mat-card {
 
 .score-board {
     max-width: 300px;
-    /*margin: 2rem auto;*/
+    margin: auto;
 }
 
 .canvas-wrapper {
