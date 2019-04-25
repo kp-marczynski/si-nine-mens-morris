@@ -93,9 +93,15 @@ THE SOFTWARE.
 
 @angular/material/core
 
+@angular/material/dialog
+
 @angular/material/grid-list
 
+@angular/material/icon
+
 @angular/material/list
+
+@angular/material/progress-spinner
 
 @angular/material/snack-bar
 
