@@ -8,9 +8,9 @@
     "",
     "/*",
     "./*",
-    "/index.html"
+    "./index.html"
   ],
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "icons": [
     {
       "src": "assets/icons/icon-72x72.png",
