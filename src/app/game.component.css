@@ -1,10 +1,10 @@
 mat-card {
-    margin: 1rem;
+    margin: 1rem auto;
 }
 
 .score-board {
     max-width: 300px;
-    margin: 2rem auto;
+    /*margin: 2rem auto;*/
 }
 
 .canvas-wrapper {
