@@ -21,7 +21,7 @@ export class AiPlayerService {
         // const children = this.gameService.getAllPossibleNextMoveResults(gameState);
         let isMaximizing: boolean = gameState.turn == Color.GREEN;
 
-        return this.minimaxBroadFirst(gameState, isMaximizing, Date.now(), 2 * 10e5);
+        return this.minimaxBroadFirst(gameState, isMaximizing, Date.now(), 5 * 10e4);
     }
 
     private minimaxRecursive(gameState: IGameState, isMaximizing: boolean, level: number): number {
@@ -44,7 +44,9 @@ export class AiPlayerService {
         let firstQueue: IGameStateNode[] = [root];
         let secondQueue: IGameStateNode[] = [];
         let level = 0;
-        while ((Date.now() - timeStart) < timeout / firstQueue.length) {
+        let iterationTime = Date.now() - timeStart;
+        let iterationFinishedTimestamp = Date.now();
+        while ((Date.now() - timeStart) + (iterationTime ** 2) < timeout) {
             level++;
             console.log('level: ' + level);
             for (const firstQueueElem of firstQueue) {
@@ -52,8 +54,12 @@ export class AiPlayerService {
                 firstQueueElem.children = children;
                 secondQueue = [...secondQueue, ...children];
             }
+            console.log(secondQueue.length);
             firstQueue = secondQueue;
             secondQueue = [];
+            const newIterationTimestamp = Date.now();
+            iterationTime = newIterationTimestamp - iterationFinishedTimestamp;
+            iterationFinishedTimestamp = newIterationTimestamp;
         }
         console.log('calc val');
         root.calcValue();
