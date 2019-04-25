@@ -44,6 +44,12 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     ngOnInit(): void {
+        this.initNewGame();
+    }
+
+    initNewGame(): void {
+        this.gameStates = [];
+        this.currentIndex = 0;
         this.gameStates.push(new GameState(PlayerType.HUMAN, PlayerType.HUMAN));
     }
 
@@ -75,7 +81,7 @@ export class GameComponent implements AfterViewInit, OnInit {
             2, baseRadiusSize);
         this.greenDrawerService = new DrawerService(document.getElementById('green-drawer') as HTMLCanvasElement,
             this.baseSize,
-            this.offset*0.5,
+            this.offset * 0.5,
             this.gameStates[this.currentIndex].greenPlayerState.piecesInDrawer,
             Color.GREEN,
             2, baseRadiusSize);
@@ -87,7 +93,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     addCanvasOnTouchListener(): void {
-        this.canvas.addEventListener('touchstart', (touchEvent) => this.onClickOrTouchListener(touchEvent));
+        // this.canvas.addEventListener('touchstart', (touchEvent) => this.onClickOrTouchListener(touchEvent));
     }
 
     addCanvasOnClickListener(): void {
@@ -95,7 +101,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     onClickOrTouchListener(event: UIEvent) {
-        event.preventDefault();
+        // event.preventDefault();
         if (this.getCurrentPlayerType(this.gameStates[this.gameStates.length - 1]) == PlayerType.HUMAN) {
             const relativePosition = this.canvasService.getPositionInCanvas(event);
             const selectedCircle: ICircle = this.findIntersectingPiece(this.gameStates[this.gameStates.length - 1].circles, relativePosition);
@@ -282,4 +288,8 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.dialog.open(InfoComponent);
     }
 
+    reset() {
+        this.initNewGame();
+        this.drawBoard(this.gameStates[this.currentIndex]);
+    }
 }

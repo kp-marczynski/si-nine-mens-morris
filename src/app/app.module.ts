@@ -15,7 +15,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatDialogModule} from '@angular/material/dialog';
 import {InfoComponent} from './info/info.component';
-
+import {MatExpansionModule} from '@angular/material/expansion';
 @NgModule({
     declarations: [
         GameComponent,
@@ -37,6 +37,7 @@ import {InfoComponent} from './info/info.component';
         MatProgressSpinnerModule,
         BrowserAnimationsModule,
         MatDialogModule,
+        MatExpansionModule,
         ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
     ],
     providers: [],

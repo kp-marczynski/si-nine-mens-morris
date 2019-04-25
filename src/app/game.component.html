@@ -1,15 +1,18 @@
 <div *ngIf="gameStates[currentIndex]">
-    <h1>
-        <span class="header-wrapper">{{gameStates[currentIndex].moveCount + 1}}</span>
-        <span> : </span>
-        <span class="header-wrapper">{{gameStates[currentIndex].turn}}</span>
-        <span> : </span>
-        <span class="header-wrapper">{{gameStates[currentIndex].moveType}} </span>
-        <span *ngIf="getCurrentPlayerType(gameStates[currentIndex]) == 'COMPUTER'">
+    <div id="game-wrapper">
+        <h1>
+            <span class="header-wrapper">{{gameStates[currentIndex].moveCount + 1}}</span>
+            <span> : </span>
+            <span class="header-wrapper">{{gameStates[currentIndex].turn}}</span>
+            <span> : </span>
+            <span class="header-wrapper">{{gameStates[currentIndex].moveType}} </span>
+            <span *ngIf="getCurrentPlayerType(gameStates[currentIndex]) == 'COMPUTER'">
             <mat-spinner [diameter]="32"></mat-spinner>
         </span>
-    </h1>
-    <div id="game-wrapper">
+        </h1>
+        <h1>
+            <button mat-stroked-button (click)="reset()">Restart Game</button>
+        </h1>
         <mat-card class="canvas-wrapper" id="canvas-wrapper">
             <canvas id="canvas" width="400" height="400">></canvas>
         </mat-card>
@@ -28,7 +31,7 @@
     </div>
     <div>
         <h1>
-            <button mat-stroked-button (click)="openInfoDialog()">
+            <button mat-button (click)="openInfoDialog()">
                 <mat-icon>help</mat-icon>
             </button>
         </h1>
@@ -128,16 +131,16 @@
                 </table>
             </mat-card-content>
         </mat-card>
-        <mat-card class="score-board" *ngIf="gameStates[currentIndex].moves.length != 0">
-            <mat-card-header>
-                <h1>Moves</h1>
-            </mat-card-header>
-            <mat-card-content>
-                <mat-nav-list>
-                    <mat-list-item
-                            *ngFor="let move of gameStates[currentIndex].moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
-                </mat-nav-list>
-            </mat-card-content>
-        </mat-card>
+        <mat-expansion-panel class="score-board" *ngIf="gameStates[currentIndex].moves.length != 0">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Moves
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-list>
+                <mat-list-item
+                        *ngFor="let move of gameStates[currentIndex].moves">{{move.count}} {{move.color}} {{move.moveType}} {{move.moveDescription}}</mat-list-item>
+            </mat-list>
+        </mat-expansion-panel>
     </div>
 </div>
