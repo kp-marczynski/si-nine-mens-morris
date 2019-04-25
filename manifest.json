@@ -1,7 +1,7 @@
 {
   "name": "si-nine-mens-morris",
   "short_name": "si-nine-mens-morris",
-  "theme_color": "#1976d2",
+  "theme_color": "#3f51b5",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./*",
