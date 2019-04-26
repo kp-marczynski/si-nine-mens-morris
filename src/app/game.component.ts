@@ -13,6 +13,7 @@ import {AiPlayerService} from "./service/ai-player.service";
 import {MatDialog, MatSnackBar} from "@angular/material";
 import {InfoComponent} from "./info/info.component";
 import {EndgameComponent} from "./endgame/endgame.component";
+import {SwUpdate} from "@angular/service-worker";
 
 @Component({
     selector: 'app-root',
@@ -39,13 +40,21 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     defaultCanvasSize = 400;
 
-    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar, private dialog: MatDialog) {
+    constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar, private dialog: MatDialog, private swUpdate: SwUpdate) {
         this.redPlayerType = PlayerType.HUMAN;
         this.greenPlayerType = PlayerType.HUMAN;
     }
 
     ngOnInit(): void {
-        this.initNewGame();
+        if (this.swUpdate.isEnabled) {
+            this.swUpdate.available.subscribe(() => {
+                if (confirm("New version available. Load New Version?")) {
+                    window.location.reload();
+                }
+            });
+        } else {
+            this.initNewGame();
+        }
     }
 
     initNewGame(): void {
