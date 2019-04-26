@@ -18,13 +18,16 @@ import {InfoComponent} from './info/info.component';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatMenuModule} from '@angular/material/menu';
+import { EndgameComponent } from './endgame/endgame.component';
 @NgModule({
     declarations: [
         GameComponent,
-        InfoComponent
+        InfoComponent,
+        EndgameComponent
     ],
     entryComponents: [
-        InfoComponent
+        InfoComponent,
+        EndgameComponent
     ],
     imports: [
         BrowserModule,

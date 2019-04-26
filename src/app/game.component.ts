@@ -12,6 +12,7 @@ import {GameService} from "./service/game.service";
 import {AiPlayerService} from "./service/ai-player.service";
 import {MatDialog, MatSnackBar} from "@angular/material";
 import {InfoComponent} from "./info/info.component";
+import {EndgameComponent} from "./endgame/endgame.component";
 
 @Component({
     selector: 'app-root',
@@ -157,6 +158,7 @@ export class GameComponent implements AfterViewInit, OnInit {
             this.drawBoard(this.gameStates[this.currentIndex]);
             if (gameState.moveType == MoveType.END_GAME) {
                 console.log(gameState);
+                this.openEndgameDialog();
                 // alert("Player " + gameState.turn + " has lost");
             } else if (this.getCurrentPlayerType(gameState) == PlayerType.COMPUTER) {
                 this.performComputerMove();
@@ -285,5 +287,17 @@ export class GameComponent implements AfterViewInit, OnInit {
     reset() {
         this.initNewGame();
         this.drawBoard(this.gameStates[this.currentIndex]);
+    }
+
+    openEndgameDialog(): void {
+        const dialogRef = this.dialog.open(EndgameComponent, {
+            width: '250px',
+            data: this.gameStates[this.currentIndex].turn
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            console.log('The dialog was closed');
+            this.reset();
+        });
     }
 }
