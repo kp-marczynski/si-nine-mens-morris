@@ -47,13 +47,13 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     ngOnInit(): void {
         this.initNewGame();
-        if (this.swUpdate.isEnabled) {
-            this.swUpdate.available.subscribe(() => {
-                if (confirm("New version available. Load New Version?")) {
-                    window.location.reload();
-                }
-            });
-        }
+        // if (this.swUpdate.isEnabled) {
+        //     this.swUpdate.available.subscribe(() => {
+        //         if (confirm("New version available. Load New Version?")) {
+        //             window.location.reload();
+        //         }
+        //     });
+        // }
     }
 
     initNewGame(): void {
