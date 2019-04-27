@@ -21,7 +21,7 @@ export class AiPlayerService {
         // const children = this.gameService.getAllPossibleNextMoveResults(gameState);
         let isMaximizing: boolean = gameState.turn == Color.GREEN;
 
-        return this.minimaxBroadFirst(gameState, isMaximizing, Date.now(), 3 * 10e4);
+        return this.minimaxBroadFirst(gameState, isMaximizing, Date.now(), 5 * 10e4);
     }
 
     private minimaxRecursive(gameState: IGameState, isMaximizing: boolean, level: number): number {
