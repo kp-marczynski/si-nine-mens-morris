@@ -69,7 +69,6 @@ export class GameService {
     private findDestinationsForOpponentRemove(gameState: IGameState): ICircle[] {
         const filtered = gameState.circles.filter(piece => piece.color === getOpponentColor(gameState.turn));
         const piecesNotInMills = this.findPiecesNotInMills(filtered, getOpponentColor(gameState.turn));
-        console.log(piecesNotInMills);
         if (piecesNotInMills.length > 0) {
             return piecesNotInMills;
         } else {
