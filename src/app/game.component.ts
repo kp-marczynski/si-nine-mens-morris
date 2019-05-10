@@ -14,6 +14,8 @@ import {MatDialog, MatSnackBar} from "@angular/material";
 import {InfoComponent} from "./info/info.component";
 import {EndgameComponent} from "./endgame/endgame.component";
 import {SwUpdate} from "@angular/service-worker";
+import {AlgorithmType} from "./model/enum/algorithm-type.enum";
+import {HeuristicsType} from "./model/enum/heuristics-type.enum";
 
 @Component({
     selector: 'app-root',
@@ -37,6 +39,13 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     redPlayerType: PlayerType;
     greenPlayerType: PlayerType;
+
+    // algorithmType: AlgorithmType = AlgorithmType.MINI_MAX;
+    greenAiAlgorithm: AlgorithmType = AlgorithmType.MINI_MAX;
+    redAiAlgorithm: AlgorithmType = AlgorithmType.MINI_MAX;
+
+    greenHeuristics: HeuristicsType = HeuristicsType.NAIVE;
+    redHeuristics: HeuristicsType = HeuristicsType.NAIVE;
 
     defaultCanvasSize = 400;
 
@@ -202,7 +211,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     performComputerMove() {
         let state: IGameState = null;
         new Promise((resolve, reject) => setTimeout(() => {
-            state = this.aiPlayerService.minimax(this.gameStates[this.currentIndex]);
+            state = this.aiPlayerService.performComputerMove(this.gameStates[this.currentIndex], this.getAlgorithmForCurrentAI(), this.getHeuristicsForCurrentAI());
             if (state) {
                 // this.gameState = state;
                 this.showSnackBarWithMoveResult(state);
@@ -213,6 +222,24 @@ export class GameComponent implements AfterViewInit, OnInit {
             resolve();
         }, 100)).then(() => this.processMoveResult(state));
 
+    }
+
+    getAlgorithmForCurrentAI() {
+        switch (this.gameStates[this.currentIndex].turn) {
+            case Color.GREEN:
+                return this.greenAiAlgorithm;
+            case Color.RED:
+                return this.redAiAlgorithm;
+        }
+    }
+
+    getHeuristicsForCurrentAI() {
+        switch (this.gameStates[this.currentIndex].turn) {
+            case Color.GREEN:
+                return this.greenHeuristics;
+            case Color.RED:
+                return this.redHeuristics;
+        }
     }
 
     showSnackBarWithMoveResult(gameState: IGameState) {

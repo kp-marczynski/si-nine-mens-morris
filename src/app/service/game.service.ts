@@ -7,6 +7,7 @@ import {IPlayerState} from "../model/player-state.model";
 import {GameState, IGameState} from "../model/game-state.model";
 import {cloneDeep} from 'lodash';
 import {BasicMove, ShiftMove} from "../model/move.model";
+import {HeuristicsType} from "../model/enum/heuristics-type.enum";
 
 @Injectable({
     providedIn: 'root'
@@ -399,7 +400,51 @@ export class GameService {
         return result;
     }
 
-    getValue(gameState: IGameState): number {
-        return (gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1);// / gameState.moveCount;
+    getValue(gameState: IGameState, heuristics: HeuristicsType): number {
+        switch (heuristics) {
+            case HeuristicsType.NAIVE:
+                return this.getValueNaive(gameState);
+            case HeuristicsType.ALMOST_MILL:
+                return this.getValueAlmostMill(gameState);
+        }
+    }
+
+    getValueNaive(gameState: IGameState): number {
+        return (gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1);
+    }
+
+    getValueAlmostMill(gameState: IGameState): number {
+        const almostMills = this.countAlmostMills(gameState.circles, Color.GREEN) - this.countAlmostMills(gameState.circles, Color.RED);
+        return this.getValueNaive(gameState) * 10 + almostMills;
+    }
+
+    private countAlmostMills(pieces: ICircle[], color: Color): number {
+        let result = 0;
+        for (let i = 0; i < 7; ++i) {
+            let xPieces = pieces.filter(piece => piece.x == i && piece.color == color);
+            let yPieces = pieces.filter(piece => piece.y == i && piece.color == color);
+            if (i == 3) {
+                if (xPieces.filter(piece => piece.y < 3).length == 2 && !pieces.find(piece => piece.x == i && piece.y < 3 && piece.color == getOpponentColor(color))) {
+                    result++;
+                }
+                if (xPieces.filter(piece => piece.y > 3).length == 2 && !pieces.find(piece => piece.x == i && piece.y > 3 && piece.color == getOpponentColor(color))) {
+                    result++;
+                }
+                if (yPieces.filter(piece => piece.x < 3).length == 2 && !pieces.find(piece => piece.y == i && piece.x < 3 && piece.color == getOpponentColor(color))) {
+                    result++;
+                }
+                if (yPieces.filter(piece => piece.x > 3).length == 2 && !pieces.find(piece => piece.y == i && piece.x < 3 && piece.color == getOpponentColor(color))) {
+                    result++;
+                }
+            } else {
+                if (xPieces.length == 2 && !pieces.find(piece => piece.x == i && piece.color == getOpponentColor(color))) {
+                    result++;
+                }
+                if (yPieces.length == 2 && !pieces.find(piece => piece.y == i && piece.color == getOpponentColor(color))) {
+                    result++;
+                }
+            }
+        }
+        return result;
     }
 }

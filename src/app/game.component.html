@@ -13,7 +13,7 @@
             </button>
             <button mat-button [matMenuTriggerFor]="menu">Settings</button>
             <mat-menu #menu="matMenu">
-                <table>
+                <table (click) = "$event.stopPropagation()">
                     <tr>
                         <th>Red player</th>
                         <td>
@@ -41,27 +41,57 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Solving algorithm</th>
+                        <th>Red AI algorithm</th>
                         <td>
-                            <mat-button-toggle-group value="minimax">
-                                <mat-button-toggle value="minimax">
+                            <mat-button-toggle-group [value]="redAiAlgorithm"
+                                                     (change)="redAiAlgorithm=='MINI-MAX'?redAiAlgorithm='ALPHA-BETA':redAiAlgorithm='MINI-MAX'">
+                                <mat-button-toggle value="MINI-MAX">
                                     MINI-MAX
                                 </mat-button-toggle>
-                                <mat-button-toggle value="alpha-beta" disabled>
+                                <mat-button-toggle value="ALPHA-BETA">
                                     &alpha;-&beta;
                                 </mat-button-toggle>
                             </mat-button-toggle-group>
                         </td>
                     </tr>
                     <tr>
-                        <th>Heuristic</th>
+                        <th>Green AI algorithm</th>
                         <td>
-                            <mat-button-toggle-group value="naive">
-                                <mat-button-toggle value="naive">
+                            <mat-button-toggle-group [value]="greenAiAlgorithm"
+                                                     (change)="greenAiAlgorithm=='MINI-MAX'?greenAiAlgorithm='ALPHA-BETA':greenAiAlgorithm='MINI-MAX'">
+                                <mat-button-toggle value="MINI-MAX">
+                                    MINI-MAX
+                                </mat-button-toggle>
+                                <mat-button-toggle value="ALPHA-BETA">
+                                    &alpha;-&beta;
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Red heuristics</th>
+                        <td>
+                            <mat-button-toggle-group [value]="redHeuristics"
+                                                     (change)="redHeuristics=='NAIVE'?redHeuristics='ALMOST-MILL':redHeuristics='NAIVE'">
+                                <mat-button-toggle value="NAIVE">
                                     NAIVE
                                 </mat-button-toggle>
-                                <mat-button-toggle value="other" disabled>
-                                    OTHER
+                                <mat-button-toggle value="ALMOST-MILL">
+                                    +/- MILL
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Green heuristics</th>
+                        <td>
+                            <mat-button-toggle-group [value]="greenHeuristics"
+                                                     (change)="greenHeuristics=='NAIVE'?greenHeuristics='ALMOST-MILL':greenHeuristics='NAIVE'">
+                                <mat-button-toggle value="NAIVE">
+                                    NAIVE
+                                </mat-button-toggle>
+                                <mat-button-toggle value="ALMOST-MILL">
+                                    +/- MILL
                                 </mat-button-toggle>
                             </mat-button-toggle-group>
                         </td>

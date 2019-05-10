@@ -8,6 +8,10 @@ export interface IGameStateNode {
 
     isMaximizing: boolean;
 
+    isAlphaBeta: boolean;
+    alpha: number;
+    beta: number;
+
     calcValue(): number;
 
     getBestChild(): IGameStateNode;
@@ -16,6 +20,9 @@ export interface IGameStateNode {
 export class GameStateNode implements IGameStateNode {
     children: IGameStateNode[];
     imminentValue: number;
+    alpha: number = null;
+    beta: number = null;
+    isAlphaBeta: boolean = false;
 
     constructor(public root: IGameState, public isMaximizing: boolean, public value: number) {
         this.imminentValue = value;
@@ -25,9 +32,45 @@ export class GameStateNode implements IGameStateNode {
         if (!this.children || this.children.length == 0) {
             return this.value;
         } else {
-            const childrenValues: number[] = this.children.map(child => child.calcValue());
-            this.value = this.isMaximizing ? Math.max(...childrenValues) : Math.min(...childrenValues);
-            return this.value;
+            if (!this.isAlphaBeta) {
+                const childrenValues: number[] = this.children.map(child => child.calcValue());
+                this.value = this.isMaximizing ? Math.max(...childrenValues) : Math.min(...childrenValues);
+                return this.value;
+            } else {
+                let alphabetaCut = false;
+                for (let i = 0; i < this.children.length && !alphabetaCut; ++i) {
+                    let currentChild = this.children[i];
+                    currentChild.alpha = this.alpha;
+                    currentChild.beta = this.beta;
+
+                    let childValue = currentChild.calcValue();
+                    if (childValue != null) {
+                        if (this.isMaximizing && (this.alpha == null || this.alpha < childValue)) {
+                            this.alpha = childValue;
+                        } else if (!this.isMaximizing && (this.beta == null || this.beta > childValue)) {
+                            this.beta = childValue;
+                        }
+                    }
+
+                    if (this.alpha != null && this.beta != null) {
+                        if (this.isMaximizing && this.alpha > this.beta) {
+                            alphabetaCut = true;
+                        } else if (!this.isMaximizing && this.alpha < this.beta) {
+                            alphabetaCut = true;
+                        }
+                    }
+                }
+                if (alphabetaCut) {
+                    this.value = null;
+                } else {
+                    if (this.isMaximizing) {
+                        this.value = this.alpha;
+                    } else {
+                        this.value = this.beta;
+                    }
+                }
+                return this.value;
+            }
         }
     }
 
