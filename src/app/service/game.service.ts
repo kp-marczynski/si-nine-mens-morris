@@ -67,7 +67,42 @@ export class GameService {
     }
 
     private findDestinationsForOpponentRemove(gameState: IGameState): ICircle[] {
-        return gameState.circles.filter(piece => piece.color === getOpponentColor(gameState.turn));
+        const filtered = gameState.circles.filter(piece => piece.color === getOpponentColor(gameState.turn));
+        const piecesNotInMills = this.findPiecesNotInMills(filtered, getOpponentColor(gameState.turn));
+        console.log(piecesNotInMills);
+        if (piecesNotInMills.length > 0) {
+            return piecesNotInMills;
+        } else {
+            return filtered;
+        }
+    }
+
+    private findPiecesNotInMills(pieces: ICircle[], color: Color): ICircle[] {
+        let temp: ICircle[] = [];
+        for (let i = 0; i < 7; ++i) {
+            let xPieces = pieces.filter(piece => piece.x == i && piece.color == color);
+            let yPieces = pieces.filter(piece => piece.y == i && piece.color == color);
+            if (i == 3) {
+                temp = this.addToResultWhenInMill(temp, xPieces.filter(piece => piece.y < 3));
+                temp = this.addToResultWhenInMill(temp, xPieces.filter(piece => piece.y > 3));
+                temp = this.addToResultWhenInMill(temp, yPieces.filter(piece => piece.x < 3));
+                temp = this.addToResultWhenInMill(temp, yPieces.filter(piece => piece.x > 3));
+            }
+            temp = this.addToResultWhenInMill(temp, xPieces);
+            temp = this.addToResultWhenInMill(temp, yPieces);
+        }
+        let result: ICircle[] = pieces;
+        for (let pieceTemp of temp) {
+            result = result.filter(piece => !(piece.x == pieceTemp.x && piece.y == pieceTemp.y));
+        }
+        return result;
+    }
+
+    private addToResultWhenInMill(result: ICircle[], possibleMill: ICircle[]): ICircle[] {
+        if (possibleMill.length == 3) {
+            result = [...result, ...possibleMill];
+        }
+        return result;
     }
 
     private findShiftSources(gameState: IGameState): ICircle[] {
