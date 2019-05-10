@@ -16,6 +16,7 @@ import {EndgameComponent} from "./endgame/endgame.component";
 import {SwUpdate} from "@angular/service-worker";
 import {AlgorithmType} from "./model/enum/algorithm-type.enum";
 import {HeuristicsType} from "./model/enum/heuristics-type.enum";
+import {EndgameData} from "./model/endgame-data.model";
 
 @Component({
     selector: 'app-root',
@@ -49,6 +50,8 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     defaultCanvasSize = 400;
 
+    gameStartTime = Date.now();
+
     constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar, private dialog: MatDialog, private swUpdate: SwUpdate) {
         this.redPlayerType = PlayerType.HUMAN;
         this.greenPlayerType = PlayerType.HUMAN;
@@ -68,6 +71,8 @@ export class GameComponent implements AfterViewInit, OnInit {
     initNewGame(): void {
         this.gameStates = [];
         this.currentIndex = 0;
+        this.redPlayerType = PlayerType.HUMAN;
+        this.greenPlayerType = PlayerType.HUMAN;
         this.gameStates.push(new GameState(PlayerType.HUMAN, PlayerType.HUMAN));
     }
 
@@ -168,7 +173,11 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     processMoveResult(gameState: IGameState): void {
+        if (this.currentIndex == 0) {
+            this.gameStartTime = Date.now();
+        }
         if (gameState != null) {
+
             this.gameStates = this.gameStates.slice(0, this.currentIndex + 1);
             this.gameStates.push(gameState);
             this.currentIndex++;
@@ -325,9 +334,10 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     openEndgameDialog(): void {
+        const endgameDate = new EndgameData(this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime);
         const dialogRef = this.dialog.open(EndgameComponent, {
             width: '250px',
-            data: this.gameStates[this.currentIndex].turn
+            data: endgameDate
         });
 
         dialogRef.afterClosed().subscribe(result => {

@@ -16,6 +16,7 @@ export interface IGameState {
     allowedMoves: ICircle[];
     moveCount: number;
     moves: IMove[];
+    movesWithoutMill: number;
 }
 
 const boardCenter = 3;
@@ -33,6 +34,7 @@ export class GameState implements IGameState {
     allowedMoves: ICircle[];
     moveCount: number;
     moves: IMove[] = [];
+    movesWithoutMill = 0;
 
     constructor(redPlayerType: PlayerType, greenPlayerType: PlayerType) {
         this.redPlayerState = new PlayerState(Color.RED, redPlayerType);

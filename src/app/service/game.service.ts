@@ -146,7 +146,11 @@ export class GameService {
 
             const pieces = gameState.circles.filter(c => c.color === gameState.turn);
             const mill = this.checkForMill(pieces, destination);
-
+            if (mill > 0) {
+                gameState.movesWithoutMill = 0;
+            } else {
+                gameState.movesWithoutMill++;
+            }
             switch (mill) {
                 case 1:
                     gameState.moveType = MoveType.REMOVE_OPPONENT;
@@ -349,7 +353,7 @@ export class GameService {
 
         const allPieces = usedPieces + availablePieces;
 
-        if (allPieces < 3) {
+        if (allPieces < 3 || gameState.movesWithoutMill == 50) {
             gameState.moveType = MoveType.END_GAME;
             // alert("Player " + gameState.turn + " has lost");
         } else if (availablePieces > 0) {
@@ -445,7 +449,18 @@ export class GameService {
     }
 
     getValueNaive(gameState: IGameState): number {
-        return (gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1);
+        let endgameBonus = 0;
+        if (gameState.moveType == MoveType.END_GAME) {
+            switch (gameState.turn) {
+                case Color.GREEN:
+                    endgameBonus = -10;
+                    break;
+                case Color.RED:
+                    endgameBonus = 10;
+                    break;
+            }
+        }
+        return ((gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1)) + endgameBonus;
     }
 
     getValueAlmostMill(gameState: IGameState): number {
