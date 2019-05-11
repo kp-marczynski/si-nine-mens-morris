@@ -5,3 +5,16 @@ button {
 h1 {
     text-align: center;
 }
+
+td {
+    min-width: 75px;
+    text-align: center;
+}
+
+th {
+    text-align: left;
+}
+
+.content-wrapper {
+    margin: auto;
+}

@@ -374,6 +374,9 @@ export class GameService {
         }
 
         if (gameState.moveType == MoveType.END_GAME || gameState.moveType == MoveType.DRAW) {
+            if (this.getOpponentPlayer(gameState).points > this.getCurrentPlayer(gameState).points) {
+                gameState.turn = this.getOpponentPlayer(gameState).color;
+            }
             return MoveResult.END_GAME;
         } else {
             switch (gameState.moveType) {

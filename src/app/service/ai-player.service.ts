@@ -23,13 +23,13 @@ export class AiPlayerService {
         // const children = this.gameService.getAllPossibleNextMoveResults(gameState);
         let isMaximizing: boolean = gameState.turn == Color.GREEN;
 
-        const root = this.broadFirstTreeGenerate(gameState, isMaximizing, Date.now(), 5 * 10e4, heuristics);
-        switch (algorithmType) {
-            case AlgorithmType.MINI_MAX:
-                return this.minimax(root);
-            case AlgorithmType.ALPHA_BETA:
-                return this.alphabeta(root);
-        }
+        // const root = this.broadFirstTreeGenerate(gameState, isMaximizing, Date.now(), 5 * 10e4, heuristics);
+        let root = new GameStateNode(this.gameService, gameState, isMaximizing, 0, heuristics, algorithmType);
+        console.log(algorithmType);
+        console.log(heuristics);
+        root = this.broadFirstTreeGenerate(root, Date.now(), 3 * 10e4, heuristics);
+        root.calcValue();
+        return root.getBestChild().root;
     }
 
     // private minimaxRecursive(gameState: IGameState, isMaximizing: boolean, level: number): number {
@@ -47,18 +47,19 @@ export class AiPlayerService {
     //     return isMaximizing ? Math.max(...childrenValues) : Math.min(...childrenValues);
     // }
 
-    private broadFirstTreeGenerate(gameState: IGameState, isMaximizing: boolean, timeStart: number, timeout: number, heuristics: HeuristicsType): IGameStateNode {
-        const root = new GameStateNode(gameState, isMaximizing, this.gameService.getValue(gameState, heuristics));
+    private broadFirstTreeGenerate(root: IGameStateNode, timeStart: number, timeout: number, heuristics: HeuristicsType): IGameStateNode {
+        // const root = new GameStateNode(this.gameService, gameState, isMaximizing, this.gameService.getValue(gameState, heuristics), 0, heuristics);
         let firstQueue: IGameStateNode[] = [root];
         let secondQueue: IGameStateNode[] = [];
         let level = 0;
         let iterationTime = Date.now() - timeStart;
         let iterationFinishedTimestamp = Date.now();
-        while ((Date.now() - timeStart) + (iterationTime ** 2) < timeout) {
+        while ((Date.now() - timeStart) + (iterationTime ** 2) < timeout && level < 10) {
             level++;
             console.log('level: ' + level);
             for (const firstQueueElem of firstQueue) {
-                const children = this.gameService.getAllPossibleNextMoveResults(firstQueueElem.root).map(state => new GameStateNode(state, !firstQueueElem.isMaximizing, this.gameService.getValue(state, heuristics)));
+                const children = this.gameService.getAllPossibleNextMoveResults(firstQueueElem.root)
+                    .map(state => GameStateNode.createFromParent(firstQueueElem, state));
                 firstQueueElem.children = children;
                 secondQueue = [...secondQueue, ...children];
             }
@@ -70,19 +71,6 @@ export class AiPlayerService {
             iterationFinishedTimestamp = newIterationTimestamp;
         }
         return root;
-    }
-
-    private minimax(root: IGameStateNode): IGameState {
-        console.log('minimax');
-        root.calcValue();
-        return root.getBestChild().root;
-    }
-
-    private alphabeta(root: IGameStateNode): IGameState {
-        console.log('alpha-beta');
-        root.isAlphaBeta = true;
-        root.calcValue();
-        return root.getBestChild().root;
     }
 
 }

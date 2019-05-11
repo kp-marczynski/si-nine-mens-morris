@@ -1,8 +1,50 @@
 <h1 mat-dialog-title>Endgame</h1>
-<p mat-dialog-content *ngIf="data.losingPlayer">{{data.losingPlayer}} player has lost!</p>
-<p mat-dialog-content *ngIf="!data.losingPlayer">Draw!</p>
-<p mat-dialog-content>Moves: {{data.moveCount}}</p>
-<p mat-dialog-content>Time: {{data.timeInMinutes | number: 2}} min</p>
+<div mat-dialog-content class="content-wrapper">
+    <p *ngIf="data.winingPlayer">{{data.winingPlayer}} player has won!</p>
+    <p *ngIf="!data.winingPlayer">Draw!</p>
+    <table>
+        <tr>
+            <th>Moves:</th>
+            <td>{{data.moveCount}}</td>
+        </tr>
+        <tr>
+            <th>Time:</th>
+            <td>{{data.timeInMinutes | number: '1.2-2'}} min</td>
+        </tr>
+        <tr>
+            <th>Red player</th>
+            <td>{{data.redPlayerType}}</td>
+        </tr>
+        <tr>
+            <th>Green player</th>
+            <td>{{data.greenPlayerType}}</td>
+        </tr>
+        <tr>
+            <th>Red player points</th>
+            <td>{{data.redPoints}}</td>
+        </tr>
+        <tr>
+            <th>Green player points</th>
+            <td>{{data.greenPoints}}</td>
+        </tr>
+        <tr *ngIf="data.redPlayerType == 'COMPUTER'">
+            <th>Red AI algorithm</th>
+            <td>{{data.redAlgorithm}}</td>
+        </tr>
+        <tr *ngIf="data.greenPlayerType == 'COMPUTER'">
+            <th>Green AI algorithm</th>
+            <td>{{data.greenAlgorithm}}</td>
+        </tr>
+        <tr *ngIf="data.redPlayerType == 'COMPUTER'">
+            <th>Red heuristics</th>
+            <td>{{data.redheuristics}}</td>
+        </tr>
+        <tr *ngIf="data.greenPlayerType == 'COMPUTER'">
+            <th>Green heuristics</th>
+            <td>{{data.greenHeuristics}}</td>
+        </tr>
+    </table>
+</div>
 <div mat-dialog-actions>
     <button mat-button [mat-dialog-close]="true">Ok</button>
 </div>

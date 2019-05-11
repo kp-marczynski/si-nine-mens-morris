@@ -334,9 +334,17 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     openEndgameDialog(): void {
-        const endgameDate = new EndgameData(this.gameStates[this.currentIndex].moveType == MoveType.DRAW ? null : this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime);
+        const endgameDate = new EndgameData(this.gameStates[this.currentIndex].moveType == MoveType.DRAW ? null : this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime, this.greenPlayerType, this.redPlayerType, this.gameStates[this.currentIndex].redPlayerState.points, this.gameStates[this.currentIndex].greenPlayerState.points);
+        if (this.greenPlayerType == PlayerType.COMPUTER) {
+            endgameDate.greenAlgorithm = this.greenAiAlgorithm;
+            endgameDate.greenHeuristics = this.greenHeuristics;
+        }
+        if (this.redPlayerType == PlayerType.COMPUTER) {
+            endgameDate.redAlgorithm = this.redAiAlgorithm;
+            endgameDate.redheuristics = this.redHeuristics;
+        }
         const dialogRef = this.dialog.open(EndgameComponent, {
-            width: '250px',
+            width: '300px',
             data: endgameDate
         });
 
