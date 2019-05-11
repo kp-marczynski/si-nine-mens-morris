@@ -352,9 +352,15 @@ export class GameService {
 
         const allPieces = usedPieces + availablePieces;
 
-        if (allPieces < 3 || gameState.movesWithoutMill == 50) {
+        if (allPieces < 3) {
             gameState.moveType = MoveType.END_GAME;
             // alert("Player " + gameState.turn + " has lost");
+        } else if (gameState.movesWithoutMill >= 50) {
+            if (gameState.greenPlayerState.points == gameState.redPlayerState.points) {
+                gameState.moveType = MoveType.DRAW;
+            } else {
+                gameState.moveType = MoveType.END_GAME;
+            }
         } else if (availablePieces > 0) {
             gameState.moveType = MoveType.NORMAL;
         } else if (usedPieces === 3) {
@@ -367,7 +373,7 @@ export class GameService {
             gameState.moveType = MoveType.MOVE_NEARBY;
         }
 
-        if (gameState.moveType == MoveType.END_GAME) {
+        if (gameState.moveType == MoveType.END_GAME || gameState.moveType == MoveType.DRAW) {
             return MoveResult.END_GAME;
         } else {
             switch (gameState.moveType) {
@@ -448,23 +454,23 @@ export class GameService {
     }
 
     getValueNaive(gameState: IGameState): number {
-        let endgameBonus = 0;
+        let endgameMultiplier = 1;
         if (gameState.moveType == MoveType.END_GAME) {
-            switch (gameState.turn) {
-                case Color.GREEN:
-                    endgameBonus = -10;
-                    break;
-                case Color.RED:
-                    endgameBonus = 10;
-                    break;
-            }
+            endgameMultiplier = 10;
+        } else if (gameState.moveType == MoveType.DRAW) {
+            endgameMultiplier = 0;
         }
-        return ((gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1)) + endgameBonus;
+        return ((gameState.greenPlayerState.points - gameState.redPlayerState.points) / (gameState.greenPlayerState.points + gameState.redPlayerState.points + 1)) * endgameMultiplier;
     }
 
     getValueAlmostMill(gameState: IGameState): number {
-        const almostMills = this.countAlmostMills(gameState.circles, Color.GREEN) - this.countAlmostMills(gameState.circles, Color.RED);
-        return this.getValueNaive(gameState) * 10 + almostMills;
+        let valueNaive = this.getValueNaive(gameState);
+        if (valueNaive != 0) {
+            const almostMills = this.countAlmostMills(gameState.circles, Color.GREEN) - this.countAlmostMills(gameState.circles, Color.RED);
+            return valueNaive * 10 + almostMills;
+        } else {
+            return 0;
+        }
     }
 
     private countAlmostMills(pieces: ICircle[], color: Color): number {

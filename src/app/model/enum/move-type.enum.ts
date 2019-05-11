@@ -4,5 +4,6 @@ export enum MoveType {
     REMOVE_OPPONENT_2 = 'REMOVE OPPONENT x2',
     MOVE_NEARBY = 'MOVE NEARBY',
     MOVE_ANYWHERE = 'MOVE ANYWHERE',
-    END_GAME = 'END GAME'
+    END_GAME = 'END GAME',
+    DRAW = 'DRAW'
 }

@@ -182,7 +182,7 @@ export class GameComponent implements AfterViewInit, OnInit {
             this.gameStates.push(gameState);
             this.currentIndex++;
             this.drawBoard(this.gameStates[this.currentIndex]);
-            if (gameState.moveType == MoveType.END_GAME) {
+            if (gameState.moveType == MoveType.END_GAME || gameState.moveType == MoveType.DRAW) {
                 console.log(gameState);
                 this.openEndgameDialog();
                 // alert("Player " + gameState.turn + " has lost");
@@ -334,7 +334,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     openEndgameDialog(): void {
-        const endgameDate = new EndgameData(this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime);
+        const endgameDate = new EndgameData(this.gameStates[this.currentIndex].moveType == MoveType.DRAW ? null : this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime);
         const dialogRef = this.dialog.open(EndgameComponent, {
             width: '250px',
             data: endgameDate

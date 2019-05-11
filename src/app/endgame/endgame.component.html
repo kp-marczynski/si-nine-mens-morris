@@ -1,5 +1,6 @@
 <h1 mat-dialog-title>Endgame</h1>
-<p mat-dialog-content>{{data.losingPlayer}} player has lost!</p>
+<p mat-dialog-content *ngIf="data.losingPlayer">{{data.losingPlayer}} player has lost!</p>
+<p mat-dialog-content *ngIf="!data.losingPlayer">Draw!</p>
 <p mat-dialog-content>Moves: {{data.moveCount}}</p>
 <p mat-dialog-content>Time: {{data.timeInMinutes | number: 2}} min</p>
 <div mat-dialog-actions>
