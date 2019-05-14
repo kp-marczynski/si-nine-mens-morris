@@ -395,7 +395,7 @@ export class GameComponent implements AfterViewInit, OnInit {
                 this.testCounter++;
             } else {
                 console.log('Tests results');
-                console.log(this.testResults);
+                console.log(JSON.stringify(this.testResults));
             }
         }
     }
