@@ -112,7 +112,7 @@ export class GameStateNode implements IGameStateNode {
                 resultImminentValue = childImminentValue;
             }
         }
-        console.log(this.children.map(child => child.value));
+        // console.log(this.children.map(child => child.value));
         console.log('chosen val: ' + result.value);
         console.log('is maximizing' + this.isMaximizing);
         return result;
