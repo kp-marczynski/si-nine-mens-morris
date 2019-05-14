@@ -6,6 +6,7 @@ import {GameStateNode, IGameStateNode} from "../model/game-state-node.model";
 import {MoveType} from "../model/enum/move-type.enum";
 import {AlgorithmType} from "../model/enum/algorithm-type.enum";
 import {HeuristicsType} from "../model/enum/heuristics-type.enum";
+import {PathCounter} from "../model/path-counter.model";
 
 @Injectable({
     providedIn: 'root'
@@ -15,7 +16,7 @@ export class AiPlayerService {
     constructor(private gameService: GameService) {
     }
 
-    public performComputerMove(gameState: IGameState, algorithmType: AlgorithmType, heuristics: HeuristicsType): IGameState {
+    public performComputerMove(gameState: IGameState, algorithmType: AlgorithmType, heuristics: HeuristicsType, pathCounter: PathCounter): IGameState {
         if (gameState.moveType == MoveType.END_GAME) {
             return gameState;
         }
@@ -24,7 +25,7 @@ export class AiPlayerService {
         let isMaximizing: boolean = gameState.turn == Color.GREEN;
 
         // const root = this.broadFirstTreeGenerate(gameState, isMaximizing, Date.now(), 5 * 10e4, heuristics);
-        let root = new GameStateNode(this.gameService, gameState, isMaximizing, 0, heuristics, algorithmType);
+        let root = new GameStateNode(this.gameService, gameState, isMaximizing, 0, heuristics, algorithmType, pathCounter);
         console.log(algorithmType);
         console.log(heuristics);
         root = this.broadFirstTreeGenerate(root, Date.now(), 3 * 10e4, heuristics);

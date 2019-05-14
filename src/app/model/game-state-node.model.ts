@@ -2,6 +2,7 @@ import {IGameState} from "./game-state.model";
 import {GameService} from "../service/game.service";
 import {HeuristicsType} from "./enum/heuristics-type.enum";
 import {AlgorithmType} from "./enum/algorithm-type.enum";
+import {PathCounter} from "./path-counter.model";
 
 export interface IGameStateNode {
     root: IGameState;
@@ -24,6 +25,7 @@ export interface IGameStateNode {
 
     gameService: GameService;
     heuristics: HeuristicsType;
+    pathCounter: PathCounter;
 }
 
 export class GameStateNode implements IGameStateNode {
@@ -33,12 +35,12 @@ export class GameStateNode implements IGameStateNode {
     beta: number = null;
     value: number = null;
 
-    constructor(public gameService: GameService, public root: IGameState, public isMaximizing: boolean, public level: number, public heuristics: HeuristicsType, public algorithmType: AlgorithmType) {
+    constructor(public gameService: GameService, public root: IGameState, public isMaximizing: boolean, public level: number, public heuristics: HeuristicsType, public algorithmType: AlgorithmType, public pathCounter: PathCounter) {
         // this.imminentValue = value;
     }
 
     static createFromParent(parent: IGameStateNode, root: IGameState): IGameStateNode {
-        return new GameStateNode(parent.gameService, root, !parent.isMaximizing, parent.level + 1, parent.heuristics, parent.algorithmType);
+        return new GameStateNode(parent.gameService, root, !parent.isMaximizing, parent.level + 1, parent.heuristics, parent.algorithmType, parent.pathCounter);
     }
 
     calcImminentValue(): number {
@@ -52,6 +54,7 @@ export class GameStateNode implements IGameStateNode {
         if (!this.children || this.children.length == 0) {
             // console.log('back on level ' + this.level);
             this.value = this.calcImminentValue();
+            this.pathCounter.increase();
             return this.value;
         } else {
             if (this.algorithmType != AlgorithmType.ALPHA_BETA) {

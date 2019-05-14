@@ -20,3 +20,24 @@ Game is available online under [https://kp-marczynski.github.io/si-nine-mens-mor
 
 ### Move anywhere:
 ![](demo/move_anywhere.gif)
+
+## Tests to perform
+    green, mm, n vs red, mm, n
+    green, mm, o vs red, mm, n
+    green, mm, n vs red, mm, o
+    green, mm, o vs red, mm, o
+    
+    green, ab, n vs red, mm, n
+    green, ab, o vs red, mm, n
+    green, ab, n vs red, mm, o
+    green, ab, o vs red, mm, o
+    
+    green, mm, n vs red, ab, n
+    green, mm, o vs red, ab, n
+    green, mm, n vs red, ab, o
+    green, mm, o vs red, ab, o
+    
+    green, ab, n vs red, ab, n
+    green, ab, o vs red, ab, n
+    green, ab, n vs red, ab, o
+    green, ab, o vs red, ab, o

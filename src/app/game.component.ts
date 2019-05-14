@@ -17,6 +17,7 @@ import {SwUpdate} from "@angular/service-worker";
 import {AlgorithmType} from "./model/enum/algorithm-type.enum";
 import {HeuristicsType} from "./model/enum/heuristics-type.enum";
 import {EndgameData} from "./model/endgame-data.model";
+import {PathCounter} from "./model/path-counter.model";
 
 @Component({
     selector: 'app-root',
@@ -52,6 +53,9 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     gameStartTime = Date.now();
 
+    greenAiPathCounter: PathCounter;
+    redAiPathCounter: PathCounter;
+
     constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar, private dialog: MatDialog, private swUpdate: SwUpdate) {
         this.redPlayerType = PlayerType.HUMAN;
         this.greenPlayerType = PlayerType.HUMAN;
@@ -74,6 +78,8 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.redPlayerType = PlayerType.HUMAN;
         this.greenPlayerType = PlayerType.HUMAN;
         this.gameStates.push(new GameState(PlayerType.HUMAN, PlayerType.HUMAN));
+        this.greenAiPathCounter = new PathCounter();
+        this.redAiPathCounter = new PathCounter();
     }
 
     ngAfterViewInit(): void {
@@ -220,7 +226,7 @@ export class GameComponent implements AfterViewInit, OnInit {
     performComputerMove() {
         let state: IGameState = null;
         new Promise((resolve, reject) => setTimeout(() => {
-            state = this.aiPlayerService.performComputerMove(this.gameStates[this.currentIndex], this.getAlgorithmForCurrentAI(), this.getHeuristicsForCurrentAI());
+            state = this.aiPlayerService.performComputerMove(this.gameStates[this.currentIndex], this.getAlgorithmForCurrentAI(), this.getHeuristicsForCurrentAI(), this.getCurrentAiPathCounter());
             if (state) {
                 // this.gameState = state;
                 this.showSnackBarWithMoveResult(state);
@@ -231,6 +237,15 @@ export class GameComponent implements AfterViewInit, OnInit {
             resolve();
         }, 100)).then(() => this.processMoveResult(state));
 
+    }
+
+    getCurrentAiPathCounter() {
+        switch (this.gameStates[this.currentIndex].turn) {
+            case Color.GREEN:
+                return this.greenAiPathCounter;
+            case Color.RED:
+                return this.redAiPathCounter;
+        }
     }
 
     getAlgorithmForCurrentAI() {
@@ -334,18 +349,20 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     openEndgameDialog(): void {
-        const endgameDate = new EndgameData(this.gameStates[this.currentIndex].moveType == MoveType.DRAW ? null : this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime, this.greenPlayerType, this.redPlayerType, this.gameStates[this.currentIndex].redPlayerState.points, this.gameStates[this.currentIndex].greenPlayerState.points);
+        const endgameData = new EndgameData(this.gameStates[this.currentIndex].moveType == MoveType.DRAW ? null : this.gameStates[this.currentIndex].turn, this.gameStates[this.currentIndex].moveCount, this.gameStartTime, this.greenPlayerType, this.redPlayerType, this.gameStates[this.currentIndex].redPlayerState.points, this.gameStates[this.currentIndex].greenPlayerState.points);
         if (this.greenPlayerType == PlayerType.COMPUTER) {
-            endgameDate.greenAlgorithm = this.greenAiAlgorithm;
-            endgameDate.greenHeuristics = this.greenHeuristics;
+            endgameData.greenAlgorithm = this.greenAiAlgorithm;
+            endgameData.greenHeuristics = this.greenHeuristics;
+            endgameData.greenAiPathCounter = this.greenAiPathCounter;
         }
         if (this.redPlayerType == PlayerType.COMPUTER) {
-            endgameDate.redAlgorithm = this.redAiAlgorithm;
-            endgameDate.redheuristics = this.redHeuristics;
+            endgameData.redAlgorithm = this.redAiAlgorithm;
+            endgameData.redheuristics = this.redHeuristics;
+            endgameData.redAiPathCounter = this.redAiPathCounter;
         }
         const dialogRef = this.dialog.open(EndgameComponent, {
             width: '300px',
-            data: endgameDate
+            data: endgameData
         });
 
         dialogRef.afterClosed().subscribe(result => {
