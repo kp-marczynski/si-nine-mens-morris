@@ -18,6 +18,7 @@ import {AlgorithmType} from "./model/enum/algorithm-type.enum";
 import {HeuristicsType} from "./model/enum/heuristics-type.enum";
 import {EndgameData} from "./model/endgame-data.model";
 import {PathCounter} from "./model/path-counter.model";
+import {TestDefinition} from "./model/test-definition.model";
 
 @Component({
     selector: 'app-root',
@@ -42,7 +43,6 @@ export class GameComponent implements AfterViewInit, OnInit {
     redPlayerType: PlayerType;
     greenPlayerType: PlayerType;
 
-    // algorithmType: AlgorithmType = AlgorithmType.MINI_MAX;
     greenAiAlgorithm: AlgorithmType = AlgorithmType.MINI_MAX;
     redAiAlgorithm: AlgorithmType = AlgorithmType.MINI_MAX;
 
@@ -55,6 +55,11 @@ export class GameComponent implements AfterViewInit, OnInit {
 
     greenAiPathCounter: PathCounter;
     redAiPathCounter: PathCounter;
+
+    testDefinitions: TestDefinition[] = TestDefinition.generateTestDefinitions();
+    performTests: boolean = false;
+    testCounter = 0;
+    testResults: EndgameData[] = [];
 
     constructor(private gameService: GameService, private aiPlayerService: AiPlayerService, private snackBar: MatSnackBar, private dialog: MatDialog, private swUpdate: SwUpdate) {
         this.redPlayerType = PlayerType.HUMAN;
@@ -73,13 +78,22 @@ export class GameComponent implements AfterViewInit, OnInit {
     }
 
     initNewGame(): void {
+        if (!this.performTests) {
+            this.redPlayerType = PlayerType.HUMAN;
+            this.greenPlayerType = PlayerType.HUMAN;
+        } else {
+            this.redPlayerType = PlayerType.COMPUTER;
+            this.greenPlayerType = PlayerType.COMPUTER;
+            this.redAiAlgorithm = this.testDefinitions[this.testCounter].redAiAlgorithm;
+            this.greenAiAlgorithm = this.testDefinitions[this.testCounter].greenAiAlgorithm;
+            this.redHeuristics = this.testDefinitions[this.testCounter].redHeuristics;
+            this.greenHeuristics = this.testDefinitions[this.testCounter].greenHeuristics;
+        }
         this.gameStates = [];
         this.currentIndex = 0;
-        this.redPlayerType = PlayerType.HUMAN;
-        this.greenPlayerType = PlayerType.HUMAN;
-        this.gameStates.push(new GameState(PlayerType.HUMAN, PlayerType.HUMAN));
         this.greenAiPathCounter = new PathCounter();
         this.redAiPathCounter = new PathCounter();
+        this.gameStates.push(new GameState(this.redPlayerType, this.greenPlayerType));
     }
 
     ngAfterViewInit(): void {
@@ -118,6 +132,9 @@ export class GameComponent implements AfterViewInit, OnInit {
         this.drawBoard(this.gameStates[this.currentIndex]);
         this.addCanvasOnClickListener();
         this.addCanvasOnMouseMoveListener();
+        if (this.redPlayerType == PlayerType.COMPUTER) {
+            this.performComputerMove();
+        }
     }
 
     addCanvasOnClickListener(): void {
@@ -353,21 +370,42 @@ export class GameComponent implements AfterViewInit, OnInit {
         if (this.greenPlayerType == PlayerType.COMPUTER) {
             endgameData.greenAlgorithm = this.greenAiAlgorithm;
             endgameData.greenHeuristics = this.greenHeuristics;
-            endgameData.greenAiPathCounter = this.greenAiPathCounter;
+            endgameData.greenAiPathCounter = this.greenAiPathCounter.counter;
         }
         if (this.redPlayerType == PlayerType.COMPUTER) {
             endgameData.redAlgorithm = this.redAiAlgorithm;
             endgameData.redheuristics = this.redHeuristics;
-            endgameData.redAiPathCounter = this.redAiPathCounter;
+            endgameData.redAiPathCounter = this.redAiPathCounter.counter;
         }
-        const dialogRef = this.dialog.open(EndgameComponent, {
-            width: '300px',
-            data: endgameData
-        });
+        if (!this.performTests) {
+            const dialogRef = this.dialog.open(EndgameComponent, {
+                width: '300px',
+                data: endgameData
+            });
 
-        dialogRef.afterClosed().subscribe(result => {
-            console.log('The dialog was closed');
-            this.reset();
-        });
+            dialogRef.afterClosed().subscribe(result => {
+                console.log('The dialog was closed');
+                this.reset();
+            });
+        } else {
+            this.testResults.push(endgameData);
+            if (this.testCounter < this.testDefinitions.length - 1) {
+                this.reset();
+            } else {
+                console.log('Tests results');
+                console.log(this.testResults);
+            }
+        }
+    }
+
+    toggleTests() {
+        this.performTests = !this.performTests;
+        this.testCounter = 0;
+        this.testResults = [];
+
+        this.reset();
+        if (this.getCurrentPlayerType(this.gameStates[this.currentIndex]) == PlayerType.COMPUTER) {
+            this.performComputerMove();
+        }
     }
 }

@@ -108,8 +108,10 @@
     <div class="game-wrapper">
         <div class="buttons-wrapper">
             <h1>
-                <span class="header-wrapper">{{gameStates[currentIndex].moveCount + 1}}</span>
-                <span> : </span>
+                <span class="header-wrapper">
+                    {{gameStates[currentIndex].moveCount + 1}}
+                </span>
+                <span (click)="toggleTests()"> : </span>
                 <span class="header-wrapper player-name">
                     {{gameStates[currentIndex].turn}}
                 </span>
