@@ -391,6 +391,8 @@ export class GameComponent implements AfterViewInit, OnInit {
             this.testResults.push(endgameData);
             if (this.testCounter < this.testDefinitions.length - 1) {
                 this.reset();
+                this.performComputerMove();
+                this.testCounter++;
             } else {
                 console.log('Tests results');
                 console.log(this.testResults);

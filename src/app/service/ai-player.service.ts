@@ -28,7 +28,7 @@ export class AiPlayerService {
         let root = new GameStateNode(this.gameService, gameState, isMaximizing, 0, heuristics, algorithmType, pathCounter);
         console.log(algorithmType);
         console.log(heuristics);
-        root = this.broadFirstTreeGenerate(root, Date.now(), 3 * 10e4, heuristics);
+        root = this.broadFirstTreeGenerate(root, Date.now(), 5 * 10e4, heuristics);
         root.calcValue();
         return root.getBestChild().root;
     }
