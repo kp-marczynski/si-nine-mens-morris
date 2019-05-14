@@ -390,14 +390,25 @@ export class GameComponent implements AfterViewInit, OnInit {
         } else {
             this.testResults.push(endgameData);
             if (this.testCounter < this.testDefinitions.length - 1) {
+                this.testCounter++;
                 this.reset();
                 this.performComputerMove();
-                this.testCounter++;
             } else {
                 console.log('Tests results');
-                console.log(JSON.stringify(this.testResults));
+                this.downloadTestsResults();
             }
         }
+    }
+
+    downloadTestsResults() {
+        const result = JSON.stringify(this.testResults);
+        const element = document.createElement('a');
+        element.setAttribute('href', "data:text/json;charset=UTF-8," + encodeURIComponent(result));
+        element.setAttribute('download', "mill-results.json");
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click(); // simulate click
+        document.body.removeChild(element);
     }
 
     toggleTests() {
