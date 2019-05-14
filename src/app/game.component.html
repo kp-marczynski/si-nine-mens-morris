@@ -13,7 +13,7 @@
             </button>
             <button mat-button [matMenuTriggerFor]="menu">Settings</button>
             <mat-menu #menu="matMenu">
-                <table (click) = "$event.stopPropagation()">
+                <table (click)="$event.stopPropagation()">
                     <tr>
                         <th>Red player</th>
                         <td>
@@ -107,6 +107,7 @@
     </mat-toolbar>
     <div class="game-wrapper">
         <div class="buttons-wrapper">
+            <h1 *ngIf="performTests">Test {{testCounter + 1}} of {{testDefinitions.length}}</h1>
             <h1>
                 <span class="header-wrapper">
                     {{gameStates[currentIndex].moveCount + 1}}
